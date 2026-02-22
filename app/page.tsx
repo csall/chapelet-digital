@@ -14,7 +14,6 @@ import {
   Library,
 } from "lucide-react";
 import { getRandomQuote } from "@/lib/data/quotes";
-import { HomeBackground } from "@/components/home/HomeBackground";
 import { HomeBeadScene } from "@/components/home/HomeBeadScene";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import { CanvasErrorBoundary } from "@/components/ui/CanvasErrorBoundary";
@@ -62,9 +61,13 @@ export default function HomePage() {
 
   return (
     <div className="h-[100dvh] text-slate-100 flex flex-col relative overflow-hidden touch-none font-sans select-none">
-      <CanvasErrorBoundary>
-        <HomeBackground />
-      </CanvasErrorBoundary>
+      {/* Lightweight premium CSS background — no WebGL */}
+      <div className="fixed inset-0 -z-10 bg-[#010208]">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/50 via-[#010208] to-rose-950/30" />
+        <div className="absolute top-[-15%] right-[-10%] w-[65%] h-[65%] bg-indigo-500/[0.07] rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] left-[-15%] w-[55%] h-[55%] bg-rose-500/[0.05] rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+        <div className="absolute top-[30%] left-[20%] w-[40%] h-[40%] bg-violet-500/[0.04] rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
+      </div>
 
       <main className="flex-1 px-5 pt-[calc(env(safe-area-inset-top,24px)+0.75rem)] pb-[calc(env(safe-area-inset-bottom,20px)+5.5rem)] flex flex-col z-10 max-w-[420px] mx-auto w-full h-full justify-between items-center overflow-hidden">
 
