@@ -1,161 +1,164 @@
 "use client";
 
-import { useRef, useMemo, memo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Sparkles } from '@react-three/drei';
+import { useMemo, memo } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Environment, Sparkles, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 
 const NUM_BEADS = 33;
-const RADIUS = 1.85;
 
-/* ── Single bead ────────────────────────────────────────────── */
-const Bead = memo(({ angle, isImame = false }: { angle: number; isImame?: boolean }) => {
-    const x = Math.cos(angle) * RADIUS;
-    const y = Math.sin(angle) * RADIUS;
-    const size = isImame ? 0.28 : 0.15;
+/** 
+ * Custom Teardrop Curve for a realistic hanging rosary 
+ * Returns a Point on the curve for a given [0, 1] t 
+ */
+function getTeardropPoint(t: number) {
+    const angle = t * Math.PI * 2;
+    // Teardrop distortion: push the bottom down and narrow the top
+    const radiusX = 1.3 * (1 + 0.3 * Math.sin(angle / 2));
+    const radiusY = 2.0 * (0.8 + 0.4 * Math.sin(angle / 2));
+
+    // Rotate to hang properly (pendant at bottom)
+    const x = Math.sin(angle) * radiusX;
+    const y = -Math.cos(angle) * radiusY + 0.5; // Offset up slightly
+    return new THREE.Vector3(x, y, 0);
+}
+
+const Bead = memo(({ position, isDivider = false }: { position: THREE.Vector3; isDivider?: boolean }) => {
+    const size = isDivider ? 0.16 : 0.135;
 
     return (
-        <mesh position={[x, y, 0]}>
-            <sphereGeometry args={[size, 16, 16]} />
-            <meshPhysicalMaterial
-                color={isImame ? "#fbbf24" : "#a5b4fc"}
-                roughness={0.04}
-                metalness={0.1}
-                transmission={0.4}
-                thickness={isImame ? 2.2 : 0.9}
-                clearcoat={1}
-                clearcoatRoughness={0.02}
-                envMapIntensity={5}
-                emissive={isImame ? "#d97706" : "#6366f1"}
-                emissiveIntensity={isImame ? 0.6 : 0.28}
-            />
+        <mesh position={position}>
+            <sphereGeometry args={[size, 24, 24]} />
+            {isDivider ? (
+                /* Gold Divider bead */
+                <meshPhysicalMaterial
+                    color="#fbbf24"
+                    metalness={0.9}
+                    roughness={0.15}
+                    envMapIntensity={2}
+                    clearcoat={1}
+                />
+            ) : (
+                /* Polished Obsidian bead */
+                <meshPhysicalMaterial
+                    color="#18181b"
+                    metalness={0.1}
+                    roughness={0.02}
+                    transmission={0.05}
+                    thickness={0.5}
+                    clearcoat={1}
+                    clearcoatRoughness={0}
+                    envMapIntensity={4}
+                    reflectivity={1}
+                />
+            )}
         </mesh>
     );
 });
 Bead.displayName = "Bead";
 
-/* ── Imame pendant (decorative tail) ────────────────────────── */
-const Pendant = memo(() => {
-    const x = Math.cos(0) * RADIUS;
-    const y = Math.sin(0) * RADIUS;
+const Cord = memo(() => {
+    const points = useMemo(() => {
+        const pts = [];
+        for (let i = 0; i <= 100; i++) {
+            pts.push(getTeardropPoint(i / 100));
+        }
+        return pts;
+    }, []);
+
+    const geometry = useMemo(() => {
+        const curve = new THREE.CatmullRomCurve3(points, true);
+        return new THREE.TubeGeometry(curve, 100, 0.015, 8, true);
+    }, [points]);
+
     return (
-        <group position={[x, y, 0]}>
-            <mesh position={[0.18, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-                <cylinderGeometry args={[0.018, 0.018, 0.36, 8]} />
-                <meshPhysicalMaterial color="#e2e8f0" roughness={0.3} metalness={0.5} emissive="#c4b5fd" emissiveIntensity={0.2} />
+        <mesh geometry={geometry}>
+            <meshStandardMaterial color="#2d2d30" roughness={0.8} />
+        </mesh>
+    );
+});
+
+const Tassel = memo(() => {
+    const startPoint = getTeardropPoint(0); // Peak of the pendant area
+
+    return (
+        <group position={[startPoint.x, startPoint.y - 0.15, 0]}>
+            {/* Imame / Head Bead - Multi-tiered gold */}
+            <mesh position={[0, 0, 0]}>
+                <cylinderGeometry args={[0.06, 0.09, 0.3, 16]} />
+                <meshStandardMaterial color="#fbbf24" metalness={0.9} roughness={0.1} />
             </mesh>
-            <mesh position={[0.42, 0, 0]}>
-                <sphereGeometry args={[0.11, 12, 12]} />
-                <meshPhysicalMaterial
-                    color="#fbbf24"
-                    roughness={0.04}
-                    metalness={0.1}
-                    transmission={0.3}
-                    clearcoat={1}
-                    envMapIntensity={5}
-                    emissive="#d97706"
-                    emissiveIntensity={0.5}
-                />
+            <mesh position={[0, -0.2, 0]}>
+                <sphereGeometry args={[0.1, 16, 16]} />
+                <meshStandardMaterial color="#fbbf24" metalness={0.9} roughness={0.1} />
             </mesh>
+
+            {/* Tassel threads */}
+            <group position={[0, -0.3, 0]}>
+                {[...Array(12)].map((_, i) => {
+                    const angle = (i / 12) * Math.PI * 2;
+                    const spread = 0.08;
+                    const endX = Math.cos(angle) * spread;
+                    const endZ = Math.sin(angle) * spread;
+                    return (
+                        <mesh key={i} rotation={[0.1, angle, 0]} position={[endX / 2, -0.4, endZ / 2]}>
+                            <cylinderGeometry args={[0.006, 0.006, 0.8, 4]} />
+                            <meshStandardMaterial color="#fbbf24" opacity={0.8} transparent />
+                        </mesh>
+                    );
+                })}
+            </group>
         </group>
     );
 });
-Pendant.displayName = "Pendant";
 
-/* ── The cord connecting all beads ──────────────────────────── */
-const Cord = memo(() => {
-    const geometry = useMemo(() => {
-        const pts: THREE.Vector3[] = [];
-        for (let i = 0; i <= 128; i++) {
-            const a = (i / 128) * Math.PI * 2;
-            pts.push(new THREE.Vector3(Math.cos(a) * RADIUS, Math.sin(a) * RADIUS, 0));
+const ChapeletModel = memo(() => {
+    const beads = useMemo(() => {
+        const result = [];
+        // 33 beads divided into 11, 11, 11
+        for (let i = 0; i < 33; i++) {
+            const t = (i + 0.5) / 33;
+            // Add a divider bead every 11
+            const isDivider = (i + 1) % 11 === 0 && i !== 32;
+            result.push({ pos: getTeardropPoint(t), isDivider });
         }
-        const curve = new THREE.CatmullRomCurve3(pts, true);
-        return new THREE.TubeGeometry(curve, 128, 0.022, 8, true);
+        return result;
     }, []);
 
     return (
-        <mesh geometry={geometry}>
-            <meshPhysicalMaterial
-                color="#e8e4f0"
-                roughness={0.25}
-                metalness={0.45}
-                clearcoat={0.8}
-                envMapIntensity={2}
-                emissive="#c4b5fd"
-                emissiveIntensity={0.18}
-            />
-        </mesh>
-    );
-});
-Cord.displayName = "Cord";
-
-/* ── Subtle glow ring at bead plane ─────────────────────────── */
-const GlowRing = memo(() => {
-    const geometry = useMemo(() => new THREE.TorusGeometry(RADIUS, 0.055, 8, 128), []);
-    return (
-        <mesh geometry={geometry}>
-            <meshBasicMaterial
-                color="#818cf8"
-                transparent
-                opacity={0.10}
-                blending={THREE.AdditiveBlending}
-                depthWrite={false}
-            />
-        </mesh>
-    );
-});
-GlowRing.displayName = "GlowRing";
-
-/* ── Chapelet group with rotation animation ─────────────────── */
-const Chapelet = memo(() => {
-    const groupRef = useRef<THREE.Group>(null);
-
-    const beadAngles = useMemo(
-        () => Array.from({ length: NUM_BEADS }, (_, i) => (i / NUM_BEADS) * Math.PI * 2),
-        []
-    );
-
-    useFrame(({ clock }) => {
-        if (!groupRef.current) return;
-        const t = clock.elapsedTime;
-        groupRef.current.rotation.z = t * 0.17;
-        groupRef.current.rotation.x = Math.PI * 0.33 + Math.sin(t * 0.27) * 0.055;
-        groupRef.current.rotation.y = Math.sin(t * 0.18) * 0.04;
-    });
-
-    return (
-        <group ref={groupRef} rotation={[Math.PI * 0.33, 0, 0]}>
+        <group rotation={[0.4, 0, 0]} position={[0, 0.2, 0]}>
             <Cord />
-            <GlowRing />
-            {beadAngles.map((angle, i) => (
-                <Bead key={i} angle={angle} isImame={i === 0} />
-            ))}
-            <Pendant />
+            {beads.map((b, i) => <Bead key={i} position={b.pos} isDivider={b.isDivider} />)}
+            <Tassel />
         </group>
     );
 });
-Chapelet.displayName = "Chapelet";
 
-/* ── Export ─────────────────────────────────────────────────── */
 export const HomeBeadScene = memo(({ cameraY = 0 }: { cameraY?: number }) => (
     <Canvas
         dpr={[1, 1.5]}
-        camera={{ position: [0, cameraY, 6], fov: 44 }}
-        gl={{ alpha: true, antialias: true, powerPreference: 'default' }}
+        camera={{ position: [0, cameraY, 5], fov: 45 }}
+        gl={{ alpha: true, antialias: false, powerPreference: 'default' }}
+        frameloop="demand" // Only render on demand - extreme energy savings
         style={{ background: 'transparent', width: '100%', height: '100%' }}
     >
-        <ambientLight intensity={0.3} />
-        <pointLight position={[5, 4, 5]} intensity={5} color="#818cf8" />
-        <pointLight position={[-5, -4, 3]} intensity={3} color="#f472b6" />
-        <pointLight position={[RADIUS + 1, 0, 3]} intensity={2.5} color="#fbbf24" />
-        <pointLight position={[0, 0, -4]} intensity={1.5} color="#4f46e5" />
+        <ambientLight intensity={0.5} />
+        <spotLight position={[5, 10, 10]} intensity={20} angle={0.2} penumbra={1} color="#ffffff" />
+        <pointLight position={[-5, -5, 5]} intensity={10} color="#6366f1" />
 
-        <Environment preset="studio" />
+        <Environment preset="city" />
 
-        <Chapelet />
+        <ChapeletModel />
 
-        <Sparkles count={28} scale={5} size={1.5} speed={0.12} opacity={0.18} color="#a5b4fc" />
+        <ContactShadows
+            position={[0, -2.8, 0]}
+            opacity={0.4}
+            scale={10}
+            blur={3}
+            far={5}
+        />
+
+        <Sparkles count={15} scale={5} size={2} speed={0} opacity={0.15} color="#fbbf24" />
     </Canvas>
 ));
 HomeBeadScene.displayName = "HomeBeadScene";

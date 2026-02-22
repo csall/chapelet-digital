@@ -14,25 +14,202 @@ import {
   Library,
 } from "lucide-react";
 import { getRandomQuote } from "@/lib/data/quotes";
-import { HomeBeadScene } from "@/components/home/HomeBeadScene";
 import { useTranslation } from "@/lib/hooks/useTranslation";
-import { CanvasErrorBoundary } from "@/components/ui/CanvasErrorBoundary";
 
-/* ─── Greeting Logic ──────────────────────────────── */
+/* ─── Greeting ─────────────────────────────────────── */
 function getGreeting() {
   const h = new Date().getHours();
-  // Using text-white/40 for a consistent gray look as requested
   if (h >= 5 && h < 12)
-    return { key: "morning", icon: <Sunrise size={18} className="text-white/40" />, accent: "#94a3b8", glow: "rgba(255,255,255,0.1)" };
+    return { key: "morning", icon: <Sunrise size={16} className="text-white/40" /> };
   if (h >= 12 && h < 18)
-    return { key: "afternoon", icon: <Sun size={18} className="text-white/40" />, accent: "#94a3b8", glow: "rgba(255,255,255,0.1)" };
+    return { key: "afternoon", icon: <Sun size={16} className="text-white/40" /> };
   if (h >= 18 && h < 22)
-    return { key: "evening", icon: <Sunset size={18} className="text-white/40" />, accent: "#94a3b8", glow: "rgba(255,255,255,0.1)" };
-  return { key: "night", icon: <Moon size={18} className="text-white/40" />, accent: "#94a3b8", glow: "rgba(255,255,255,0.1)" };
+    return { key: "evening", icon: <Sunset size={16} className="text-white/40" /> };
+  return { key: "night", icon: <Moon size={16} className="text-white/40" /> };
 }
 
+/* ─── Helpers ───────────────────────────────────────── */
+function darkenHex(hex: string, f = 0.38): string {
+  if (!hex.startsWith("#") || hex.length < 7) return "#0a0f20";
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgb(${Math.round(r * f)},${Math.round(g * f)},${Math.round(b * f)})`;
+}
 
+/* ─── Static Chapelet SVG ───────────────────────────── */
+function StaticChapelet({
+  total = 33,
+  count = 0,
+  color = "#6366f1",
+}: {
+  readonly total?: number;
+  readonly count?: number;
+  readonly color?: string;
+}) {
+  const W = 300, H = 310;
+  const cx = 150, cy = 136;
+  const rx = 114, ry = 100;
 
+  const colorDark = useMemo(() => darkenHex(color), [color]);
+
+  const beads = useMemo(() => {
+    return Array.from({ length: total }, (_, i) => {
+      const angle = (i / total) * Math.PI * 2 - Math.PI / 2;
+      const isMarker =
+        total === 33
+          ? i === 10 || i === 21
+          : total > 9 && (
+              i === Math.floor(total / 3) - 1 ||
+              i === Math.floor((2 * total) / 3) - 1
+            );
+      return {
+        x: cx + rx * Math.cos(angle),
+        y: cy + ry * Math.sin(angle),
+        isMarker,
+        done: i < count,
+        key: `${i}`,
+      };
+    });
+  }, [total, count]);
+
+  const stemY = cy + ry;
+  const leaderY = stemY + 26;
+  const lr = 12; // leader bead radius
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" aria-hidden="true">
+      <defs>
+        {/* Active/done bead — lit from top-left */}
+        <radialGradient id="sc-done" cx="36%" cy="27%" r="70%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.65" />
+          <stop offset="22%" stopColor={color} />
+          <stop offset="100%" stopColor={colorDark} />
+        </radialGradient>
+
+        {/* Inactive bead */}
+        <radialGradient id="sc-idle" cx="36%" cy="27%" r="70%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.18" />
+          <stop offset="38%" stopColor="#18243e" />
+          <stop offset="100%" stopColor="#060c18" />
+        </radialGradient>
+
+        {/* Marker bead — silver */}
+        <radialGradient id="sc-mark" cx="36%" cy="27%" r="70%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.75" />
+          <stop offset="28%" stopColor="#7b8fae" />
+          <stop offset="100%" stopColor="#1a2236" />
+        </radialGradient>
+
+        {/* Leader/tête bead */}
+        <radialGradient id="sc-lead" cx="36%" cy="27%" r="70%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.45" />
+          <stop offset="30%" stopColor="#2c3d60" />
+          <stop offset="100%" stopColor="#080e1e" />
+        </radialGradient>
+
+        {/* Soft drop-shadow filter */}
+        <filter id="sc-shadow" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="black" floodOpacity="0.5" />
+        </filter>
+      </defs>
+
+      {/* ── Ambient glow when there's progress ── */}
+      {count > 0 && (
+        <ellipse
+          cx={cx} cy={cy} rx={rx + 20} ry={ry + 20}
+          fill="none" stroke={color} strokeWidth="32" opacity="0.05"
+        />
+      )}
+
+      {/* ── Cord ── */}
+      <ellipse
+        cx={cx} cy={cy} rx={rx} ry={ry}
+        fill="none"
+        stroke="rgba(180,160,120,0.18)"
+        strokeWidth="2"
+      />
+
+      {/* ── Pendant stem ── */}
+      <line
+        x1={cx} y1={stemY}
+        x2={cx} y2={leaderY - lr}
+        stroke="rgba(180,160,120,0.18)"
+        strokeWidth="2"
+      />
+
+      {/* ── Leader bead ── */}
+      <ellipse cx={cx + 2} cy={leaderY + 4} rx={lr} ry={lr * 0.5} fill="black" opacity="0.35" />
+      <circle cx={cx} cy={leaderY} r={lr} fill="url(#sc-lead)" filter="url(#sc-shadow)" />
+      {/* Main specular */}
+      <circle cx={cx - lr * 0.32} cy={leaderY - lr * 0.35} r={lr * 0.28} fill="white" opacity="0.45" />
+      {/* Micro sparkle */}
+      <circle cx={cx - lr * 0.58} cy={leaderY - lr * 0.55} r={lr * 0.1} fill="white" opacity="0.7" />
+
+      {/* ── Tassel ── */}
+      {([[-9, 18], [-3, 21], [3, 20], [9, 17]] as const).map(([dx, dy]) => (
+        <line
+          key={dx}
+          x1={cx + dx * 0.4} y1={leaderY + lr}
+          x2={cx + dx} y2={leaderY + lr + dy}
+          stroke="rgba(200,180,140,0.2)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      ))}
+
+      {/* ── Beads ── */}
+      {beads.map((b) => {
+        const r = b.isMarker ? 9.5 : 7;
+        const gradId = b.isMarker ? "sc-mark" : b.done ? "sc-done" : "sc-idle";
+        const glowOpacity = b.done && !b.isMarker ? 0.2 : 0;
+
+        return (
+          <g key={b.key}>
+            {/* Done glow halo */}
+            {glowOpacity > 0 && (
+              <circle cx={b.x} cy={b.y} r={r + 5} fill={color} opacity={glowOpacity} />
+            )}
+
+            {/* Drop shadow */}
+            <ellipse
+              cx={b.x + 1.5} cy={b.y + 2.5}
+              rx={r} ry={r * 0.5}
+              fill="black" opacity={b.done ? 0.45 : 0.28}
+            />
+
+            {/* Bead body */}
+            <circle
+              cx={b.x} cy={b.y} r={r}
+              fill={`url(#${gradId})`}
+              opacity={b.done || b.isMarker ? 1 : 0.82}
+            />
+
+            {/* Main specular */}
+            <circle
+              cx={b.x - r * 0.3}
+              cy={b.y - r * 0.35}
+              r={r * 0.28}
+              fill="white"
+              opacity={b.done ? 0.5 : b.isMarker ? 0.55 : 0.22}
+            />
+
+            {/* Micro sparkle */}
+            <circle
+              cx={b.x - r * 0.56}
+              cy={b.y - r * 0.54}
+              r={r * 0.1}
+              fill="white"
+              opacity={b.done ? 0.85 : b.isMarker ? 0.8 : 0.35}
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ─── Page ──────────────────────────────────────────── */
 export default function HomePage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -42,6 +219,7 @@ export default function HomePage() {
   const preset = useSessionStore((s) => s.preset);
   const totalCount = useSessionStore((s) => s.totalCount);
   const isComplete = useSessionStore((s) => s.isComplete);
+  const beadColor = useSessionStore((s) => s.beadColor);
   const setFreeSession = useSessionStore((s) => s.setFreeSession);
 
   useEffect(() => { setMounted(true); }, []);
@@ -50,7 +228,12 @@ export default function HomePage() {
   const dailyQuote = useMemo(() => getRandomQuote(), []);
 
   const hasActiveSession = mounted && hasHydrated && preset && totalCount > 0 && !isComplete;
-  const progress = hasActiveSession && preset && preset.totalBeads > 0 ? (totalCount / preset.totalBeads) : 0;
+  const progress = hasActiveSession && preset && preset.totalBeads > 0
+    ? (totalCount / preset.totalBeads)
+    : 0;
+
+  const chapeletTotal = preset?.totalBeads ?? 33;
+  const chapeletCount = hasActiveSession ? totalCount : 0;
 
   const handleStartFreeSession = () => {
     setFreeSession();
@@ -61,211 +244,177 @@ export default function HomePage() {
 
   return (
     <div className="h-[100dvh] text-slate-100 flex flex-col relative overflow-hidden touch-none font-sans select-none">
-      {/* Lightweight premium CSS background — no WebGL */}
+      {/* Background */}
       <div className="fixed inset-0 -z-10 bg-[#010208]">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/50 via-[#010208] to-rose-950/30" />
-        <div className="absolute top-[-15%] right-[-10%] w-[65%] h-[65%] bg-indigo-500/[0.07] rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute bottom-[-10%] left-[-15%] w-[55%] h-[55%] bg-rose-500/[0.05] rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
-        <div className="absolute top-[30%] left-[20%] w-[40%] h-[40%] bg-violet-500/[0.04] rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/30 via-[#010208] to-[#010208]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[45%] rounded-full blur-[120px]"
+          style={{ background: `${beadColor}0a` }} />
       </div>
 
-      <main className="flex-1 px-5 pt-[calc(env(safe-area-inset-top,24px)+0.75rem)] pb-[calc(env(safe-area-inset-bottom,20px)+5.5rem)] flex flex-col z-10 max-w-[420px] mx-auto w-full h-full items-center overflow-hidden">
+      <main className="flex-1 flex flex-col z-10 max-w-[390px] mx-auto w-full overflow-hidden
+        pt-[calc(env(safe-area-inset-top,24px)+0.5rem)]
+        pb-[calc(env(safe-area-inset-bottom,20px)+5.5rem)]
+        px-5 gap-3">
 
-        {/* ── HEADER ──────────────────────────────── */}
-        <div className="w-full shrink-0">
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center justify-between w-full"
-          >
-            <div className="flex items-center gap-3">
-              <motion.div
-                className="w-10 h-10 rounded-[14px] glass-premium flex items-center justify-center border border-white/10"
-                animate={{
-                  boxShadow: [
-                    `0 0 12px ${greeting.glow}`,
-                    `0 0 24px ${greeting.glow}`,
-                    `0 0 12px ${greeting.glow}`,
-                  ],
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                {greeting.icon}
-              </motion.div>
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 leading-none mb-0.5">
-                  {t.home[`greeting_${greeting.key}` as keyof typeof t.home]}
-                </p>
-                <p className="text-sm font-light text-white/75 tracking-wide">
-                  {t.home[`sub_${greeting.key}` as keyof typeof t.home]}
-                </p>
-              </div>
+        {/* ── HEADER ─────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center justify-between shrink-0"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-[10px] glass-premium flex items-center justify-center">
+              {greeting.icon}
             </div>
-
-            {/* Language toggle */}
-            <div className="flex items-center p-1 rounded-[14px] glass-premium border border-white/10" role="group" aria-label="Language selection">
-              <button
-                onClick={() => useSessionStore.getState().setLanguage('fr')}
-                aria-label="Switch to French"
-                aria-pressed={language === 'fr'}
-                className={`px-2 py-1 rounded-[10px] text-[10px] font-black transition-all ${language === 'fr' ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60'}`}
-              >
-                FR
-              </button>
-              <button
-                onClick={() => useSessionStore.getState().setLanguage('en')}
-                aria-label="Switch to English"
-                aria-pressed={language === 'en'}
-                className={`px-2 py-1 rounded-[10px] text-[10px] font-black transition-all ${language === 'en' ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60'}`}
-              >
-                EN
-              </button>
+            <div>
+              <p className="text-[8px] font-black uppercase tracking-[0.5em] text-white/20 leading-none mb-0.5">
+                {t.home[`greeting_${greeting.key}` as keyof typeof t.home]}
+              </p>
+              <p className="text-xs font-light text-white/60 tracking-wide">
+                {t.home[`sub_${greeting.key}` as keyof typeof t.home]}
+              </p>
             </div>
-          </motion.div>
-        </div>
-
-        {/* ── CENTRAL QUOTE AREA ────────────────────── */}
-        <div className="flex-1 w-full flex flex-col items-center justify-end pb-4 min-h-0 relative">
-          {/* Soft ambient glow */}
-          <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] pointer-events-none"
-            style={{
-              background: "radial-gradient(circle at center, rgba(99,102,241,0.1) 0%, transparent 65%)"
-            }}
-            animate={{ opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
-
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="shrink-0 w-full text-center px-6 relative z-20"
-          >
-            <p className="text-[17px] sm:text-[19px] leading-[1.65] text-white/75 font-light italic">
-              &ldquo;{resolve(dailyQuote.text)}&rdquo;
-            </p>
-
-            <div className="flex items-center justify-center gap-3 mt-5">
-              <div className="h-px w-6 bg-gradient-to-r from-transparent to-white/15" />
-              <span className="text-[9px] font-black uppercase tracking-[0.5em] text-white/25">
-                {resolve(dailyQuote.source)}
-              </span>
-              <div className="h-px w-6 bg-gradient-to-l from-transparent to-white/15" />
-            </div>
-          </motion.div>
-        </div>
-
-        {/* ── BLOC BAS : info + actions ────────────── */}
-        <div className="w-full shrink-0 flex flex-col gap-2.5 pt-3 pb-4">
-
-          {/* Carte progression */}
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full rounded-[22px] p-4"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-            }}
-          >
-            {hasActiveSession ? (
-              <div className="flex items-center gap-4">
-                {/* Circular progress */}
-                <div className="relative w-14 h-14 shrink-0">
-                  <svg className="w-full h-full -rotate-90">
-                    <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                    <motion.circle
-                      cx="28" cy="28" r="24" fill="none"
-                      stroke="url(#progressGrad)"
-                      strokeWidth="3" strokeLinecap="round"
-                      strokeDasharray={`${progress * 150.8} 150.8`}
-                      initial={{ strokeDasharray: "0 150.8" }}
-                      animate={{ strokeDasharray: `${progress * 150.8} 150.8` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                    />
-                    <defs>
-                      <linearGradient id="progressGrad" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#818cf8" />
-                        <stop offset="100%" stopColor="#a78bfa" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-[13px] font-black text-white tabular-nums">
-                    {Math.round(progress * 100)}%
-                  </span>
-                </div>
-
-                {/* Info + CTA */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/25 mb-1">
-                    {t.home.progression}
-                  </p>
-                  <p className="text-xs text-white/50 truncate mb-2.5 italic">
-                    &laquo;{resolve(preset?.name)}&raquo;
-                  </p>
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => router.push("/session")}
-                    aria-label={`Continue session — ${Math.round(progress * 100)}% complete`}
-                    className="w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] text-center transition-all"
-                    style={{ background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc" }}
-                  >
-                    {t.common.continue} →
-                  </motion.button>
-                </div>
-              </div>
-            ) : (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => router.push("/library")}
-                aria-label="Explore dhikr library"
-                className="w-full py-[10px] rounded-[14px] text-[10px] font-black uppercase tracking-[0.35em] text-center"
-                style={{ background: "rgba(99,102,241,0.16)", border: "1px solid rgba(99,102,241,0.24)", color: "#a5b4fc" }}
-              >
-                ▶&nbsp;&nbsp;{t.home.explorer}
-              </motion.button>
-            )}
-          </motion.div>
-
-          {/* Boutons rapides */}
-          <div className="w-full grid grid-cols-2 gap-3">
-            <motion.button
-              initial={{ opacity: 0, y: 14, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: 0.85, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              whileTap={{ scale: 0.94, y: 2 }}
-              onClick={() => router.push("/library")}
-              aria-label="Open dhikr library"
-              className="flex flex-col items-center gap-2.5 py-4 glass-premium rounded-[24px] border border-white/[0.08] relative overflow-hidden shadow-2xl"
-            >
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center" aria-hidden="true">
-                <Library size={18} className="text-indigo-400" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">{t.home.library}</span>
-            </motion.button>
-
-            <motion.button
-              initial={{ opacity: 0, y: 14, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: 0.95, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              whileTap={{ scale: 0.94, y: 2 }}
-              onClick={handleStartFreeSession}
-              aria-label="Start a free dhikr session"
-              className="flex flex-col items-center gap-2.5 py-4 glass-premium rounded-[24px] border border-white/[0.08] relative overflow-hidden shadow-2xl"
-            >
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-400/20 flex items-center justify-center">
-                <InfinityIcon size={20} className="text-rose-400" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">{t.home.free}</span>
-            </motion.button>
           </div>
 
-        </div>
+          <fieldset className="flex items-center p-1 rounded-[12px] glass-premium">
+            <legend className="sr-only">Language</legend>
+            {(["fr", "en"] as const).map((lang) => (
+              <button
+                key={lang}
+                onClick={() => useSessionStore.getState().setLanguage(lang)}
+                aria-label={`Switch to ${lang.toUpperCase()}`}
+                aria-pressed={language === lang}
+                className={`px-2 py-1 rounded-[8px] text-[10px] font-black transition-all ${
+                  language === lang ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"
+                }`}
+              >
+                {lang.toUpperCase()}
+              </button>
+            ))}
+          </fieldset>
+        </motion.div>
+
+        {/* ── CHAPELET HERO ───────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="flex-1 min-h-0 flex items-center justify-center"
+        >
+          <div className="w-full max-w-[300px] aspect-square">
+            <StaticChapelet
+              total={chapeletTotal}
+              count={chapeletCount}
+              color={beadColor}
+            />
+          </div>
+        </motion.div>
+
+        {/* ── QUOTE ───────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          className="shrink-0 text-center px-3"
+        >
+          <p className="text-[13px] leading-[1.65] text-white/50 font-light italic">
+            &ldquo;{resolve(dailyQuote.text)}&rdquo;
+          </p>
+          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 mt-2">
+            {resolve(dailyQuote.source)}
+          </p>
+        </motion.div>
+
+        {/* ── PROGRESSION / START ─────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="shrink-0 rounded-[22px] overflow-hidden"
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+          }}
+        >
+          {hasActiveSession ? (
+            <button
+              onClick={() => router.push("/session")}
+              className="w-full flex items-center gap-4 p-4 active:opacity-80 transition-opacity"
+            >
+              {/* Arc progress */}
+              <div className="relative w-14 h-14 shrink-0">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 56 56">
+                  <circle cx="28" cy="28" r="23" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+                  <circle
+                    cx="28" cy="28" r="23" fill="none"
+                    stroke={beadColor}
+                    strokeWidth="3" strokeLinecap="round"
+                    strokeDasharray={`${progress * 144.5} 144.5`}
+                    opacity="0.8"
+                  />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-[11px] font-black text-white tabular-nums">
+                  {Math.round(progress * 100)}%
+                </span>
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-1">
+                  {t.home.progression}
+                </p>
+                <p className="text-sm text-white/70 truncate font-medium">
+                  {resolve(preset?.name)}
+                </p>
+                <p className="text-[9px] text-white/30 mt-0.5">
+                  {totalCount} / {preset?.totalBeads}
+                </p>
+              </div>
+              <div className="text-white/20 text-lg pr-1">›</div>
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push("/library")}
+              className="w-full py-4 text-[10px] font-black uppercase tracking-[0.35em] text-center active:opacity-80 transition-opacity"
+              style={{ color: "#a5b4fc" }}
+            >
+              ▶&nbsp;&nbsp;{t.home.explorer}
+            </button>
+          )}
+        </motion.div>
+
+        {/* ── QUICK ACTIONS ───────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="shrink-0 grid grid-cols-2 gap-3"
+        >
+          <button
+            onClick={() => router.push("/library")}
+            className="flex flex-col items-center gap-2 py-4 glass-premium rounded-[20px] active:scale-[0.96] transition-transform"
+          >
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center">
+              <Library size={16} className="text-indigo-400" />
+            </div>
+            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/35">
+              {t.home.library}
+            </span>
+          </button>
+
+          <button
+            onClick={handleStartFreeSession}
+            className="flex flex-col items-center gap-2 py-4 glass-premium rounded-[20px] active:scale-[0.96] transition-transform"
+          >
+            <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-400/20 flex items-center justify-center">
+              <InfinityIcon size={18} className="text-rose-400" />
+            </div>
+            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/35">
+              {t.home.free}
+            </span>
+          </button>
+        </motion.div>
 
       </main>
     </div>

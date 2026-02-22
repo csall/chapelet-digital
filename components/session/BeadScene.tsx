@@ -1,15 +1,12 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Sparkles, Stars, Trail, Text } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
 import { useRef, useState, useMemo, useEffect, useCallback } from "react";
 import * as THREE from "three";
 import { useSpring, animated, to } from "@react-spring/three";
 import { memo } from "react";
 import { useSessionStore } from "@/lib/store/sessionStore";
-
-const AnimatedSparkles = animated(Sparkles);
-const AnimatedText = animated(Text);
 
 
 interface PearlProps {
@@ -37,8 +34,6 @@ const Pearl = memo(({ position, activeProgress, idx, rotation = [0, 0, 0], tapPr
     const meshRef = useRef<THREE.Mesh>(null);
     const contentRef = useRef<THREE.Group>(null);
     const groupRef = useRef<THREE.Group>(null);
-    const animTimeRef = useRef(0);
-
     // Constant base size
     const BASE_SCALE = 0.28;
 
@@ -70,32 +65,12 @@ const Pearl = memo(({ position, activeProgress, idx, rotation = [0, 0, 0], tapPr
         return "#" + c1.lerp(c2, finalMix).getHexString();
     });
 
-    const floatOffset = useMemo(() => (idx * 0.77) % (Math.PI * 2), [idx]);
-
-    useFrame((state, delta) => {
-        if (!meshRef.current || !groupRef.current) return;
-
-        // Only advance animation time if we are interactive
-        if (isInteractiveRef.current) {
-            animTimeRef.current += delta;
-        }
-
-        const time = animTimeRef.current;
+    useFrame(() => {
+        if (!contentRef.current) return;
         const p = activeProgress.get();
-
-        // 1. Static rotation
-        meshRef.current.rotation.y = 0;
-        meshRef.current.rotation.z = 0;
-
-        // 2. Weightless Float 
-        if (p > 0.01 && contentRef.current) {
-            // TAP IMPACT: Pull downward (simulating user pulling the bead)
-            // Removed idle animation (bobbing/wobble) as requested
+        if (p > 0.01) {
             const tapOffset = tapProgress.get() * 0.7 * Math.pow(p, 3);
             contentRef.current.position.y = -tapOffset;
-
-            // Reset rotation
-            contentRef.current.rotation.x = 0;
         }
     });
 
@@ -149,89 +124,21 @@ Pearl.displayName = "Pearl";
 
 const ConnectionString = memo(() => {
     return (
-        <group>
-            {/* The String itself - Much Thicker for clear visibility */}
-            <mesh castShadow receiveShadow>
-                <cylinderGeometry args={[0.04, 0.04, 20, 16]} />
-                <meshPhysicalMaterial
-                    color="#e2e8f0" // Platinum/Silver
-                    roughness={0.3}
-                    metalness={0.5}
-                    clearcoat={1}
-                    clearcoatRoughness={0.1}
-                    emissive="#94a3b8"
-                    emissiveIntensity={0.5}
-                />
-            </mesh>
-
-            {/* Subtle Divine Shimmer along the string */}
-            <Sparkles
-                count={25}
-                scale={[0.05, 20, 0.05]}
-                size={2}
-                speed={0.5}
-                opacity={0.3}
-                color="#f8fafc"
+        <mesh>
+            <cylinderGeometry args={[0.04, 0.04, 20, 8]} />
+            <meshStandardMaterial
+                color="#94a3b8"
+                roughness={0.4}
+                metalness={0.3}
+                emissive="#475569"
+                emissiveIntensity={0.3}
             />
-        </group>
+        </mesh>
     );
 });
 
 ConnectionString.displayName = "ConnectionString";
 
-const ShootingStar = () => {
-    const ref = useRef<THREE.Mesh>(null);
-    const [active, setActive] = useState(false);
-    const prefersReducedMotion = useMemo(() =>
-        typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-        []);
-
-    // Randomize start delay and position
-    const reset = useCallback(() => {
-        if (!ref.current || prefersReducedMotion) return;
-        const x = (Math.random() - 0.5) * 100;
-        const y = (Math.random() - 0.5) * 60 + 20; // High in the sky
-        const z = -40 - Math.random() * 40;
-        ref.current.position.set(x, y, z);
-        setActive(false);
-
-        // Random timeout before next launch 5s to 15s
-        setTimeout(() => setActive(true), Math.random() * 10000 + 5000);
-    }, [prefersReducedMotion]);
-
-    useEffect(() => {
-        if (prefersReducedMotion) return;
-        reset();
-    }, [reset, prefersReducedMotion]);
-
-    useFrame((state, delta) => {
-        if (!active || !ref.current) return;
-
-        // Move across screen
-        ref.current.position.x -= delta * 60; // Fast!
-        ref.current.position.y -= delta * 20; // Downward slope
-
-        // If out of bounds, reset
-        if (ref.current.position.x < -60) {
-            reset();
-        }
-    });
-
-    if (!active) return null;
-
-    return (
-        <Trail
-            width={3}
-            length={12}
-            color={new THREE.Color("#fbbf24")}
-            attenuation={(t) => t * t}
-        >
-            <mesh ref={ref}>
-                <sphereGeometry args={[0.2, 8, 8]} />
-            </mesh>
-        </Trail>
-    );
-};
 
 const ZenRipple = memo(({ trigger, color }: { trigger: number; color: string }) => {
     const meshRef = useRef<THREE.Mesh>(null);
@@ -240,9 +147,9 @@ const ZenRipple = memo(({ trigger, color }: { trigger: number; color: string }) 
 
     useEffect(() => {
         if (trigger > lastTrigger.current) {
-            setActive(true);
+            const startTimer = setTimeout(() => setActive(true), 0);
             const timer = setTimeout(() => setActive(false), 2000);
-            return () => clearTimeout(timer);
+            return () => { clearTimeout(startTimer); clearTimeout(timer); };
         }
         lastTrigger.current = trigger;
     }, [trigger]);
@@ -252,6 +159,7 @@ const ZenRipple = memo(({ trigger, color }: { trigger: number; color: string }) 
         meshRef.current.scale.addScalar(delta * 12);
         const mat = meshRef.current.material as THREE.MeshBasicMaterial;
         mat.opacity = Math.max(0, 0.15 - (meshRef.current.scale.x / 12) * 0.15);
+        state.invalidate(); // Keep rendering while ripple is active (frameloop="demand")
     });
 
     useEffect(() => {
@@ -270,36 +178,6 @@ const ZenRipple = memo(({ trigger, color }: { trigger: number; color: string }) 
 
 
 
-const StarryNightBackground = memo(() => {
-    const [theme, setTheme] = useState(useSessionStore.getState().theme);
-
-    useEffect(() => {
-        return useSessionStore.subscribe((state) => {
-            setTheme(state.theme);
-        });
-    }, []);
-
-    // Resolve 'auto' to actual mode
-    const resolvedTheme = theme === 'auto'
-        ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
-        : theme;
-
-    if (resolvedTheme === 'light') {
-        return (
-            <group>
-                {/* No background color here - we want transparency */}
-                {/* Soft warm sparkles for light mode */}
-                <Sparkles count={30} scale={30} size={2} speed={0.15} opacity={0.12} color="#c4b5fd" />
-                <Sparkles count={20} scale={25} size={3} speed={0.1} opacity={0.08} color="#93c5fd" />
-            </group>
-        );
-    }
-
-    return (
-        <group />
-    );
-});
-StarryNightBackground.displayName = "StarryNightBackground";
 
 
 interface BeadSceneProps {
@@ -310,36 +188,6 @@ interface BeadSceneProps {
     interactive?: boolean;
 }
 
-const ActiveBeadCounter = ({ countSpring }: { countSpring: any }) => {
-    const textRef = useRef<any>(null);
-    const [lastVal, setLastVal] = useState(0);
-
-    useFrame(() => {
-        if (!textRef.current) return;
-        const current = Math.round(countSpring.get());
-        if (current !== lastVal) {
-            textRef.current.text = current.toString();
-            setLastVal(current);
-        }
-    });
-
-    return (
-        <group position={[0, 2.4, -1]}>
-            {/* Minimalist Counter */}
-            <Text
-                ref={textRef}
-                fontSize={0.35}
-                color="white"
-                anchorX="center"
-                anchorY="middle"
-                fillOpacity={0.4}
-                letterSpacing={0.15}
-            >
-                0
-            </Text>
-        </group>
-    );
-};
 
 // Internal scene with animated state
 const SceneInternal = memo(({ count, beadWindow, total, presetId, tapProgress }: any) => {
@@ -528,6 +376,7 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
         >
             <Canvas
                 key="main-bead-canvas"
+                frameloop="demand"
                 shadows
                 camera={{
                     position: [0, 0, 5],
@@ -537,7 +386,6 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
                     antialias: false,
                     alpha: true,
                     powerPreference: "default",
-                    preserveDrawingBuffer: true
                 }}
                 dpr={[1, 2]}
                 onCreated={(state) => {
@@ -560,7 +408,6 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
                 />
 
                 <ZenRipple trigger={count} color={isLight ? "#6366f1" : (beadColor as string)} />
-                <StarryNightBackground />
                 <fog attach="fog" args={[isLight ? '#eeeef2' : '#05070c', isLight ? 6 : 4, isLight ? 30 : 25]} />
             </Canvas>
         </button>

@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Sparkles, BookOpen, Trash2, Plus, ChevronDown, Pencil, Play, Star, X } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useInvocationStore, type InvocationGroup, type Invocation } from "@/lib/store/invocationStore";
 import { CreateInvocationModal } from "@/components/library/CreateInvocationModal";
 import { CreateGroupModal } from "@/components/library/CreateGroupModal";
@@ -103,17 +103,10 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                 <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-rose-500/[0.04] rounded-full blur-[100px]" />
             </div>
 
-            {/* Immersive Mesh Glows - Keep some for extra depth if needed, or remove since HomeBackground has them */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 opacity-30">
-                <motion.div
-                    animate={{
-                        scale: [1, 1.3, 1],
-                        opacity: [0.06, 0.12, 0.06],
-                        x: [20, -20, 20],
-                        y: [-20, 20, -20],
-                    }}
-                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -top-[10%] -right-[15%] w-[80%] h-[60%] blur-[120px] rounded-full"
+            {/* Static ambient glow — pas d'animation infinie */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+                <div
+                    className="absolute -top-[10%] -right-[15%] w-[80%] h-[60%] blur-[120px] rounded-full opacity-[0.08]"
                     style={{ backgroundColor: beadColor }}
                 />
             </div>

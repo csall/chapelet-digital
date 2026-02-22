@@ -7,13 +7,13 @@ import { useClickSound } from "@/lib/hooks/useClickSound";
 import { useEffect, useState, Suspense, useCallback, useRef, memo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { RefreshCw, Volume2, VolumeX, RotateCcw, Vibrate, VibrateOff, Pencil } from "lucide-react";
+import { Volume2, VolumeX, RotateCcw, Vibrate, VibrateOff, Pencil } from "lucide-react";
 import { FullscreenModal } from "@/components/ui/FullscreenModal";
 import { SettingsContent } from "@/components/settings/SettingsContent";
 import { CompletionView } from "@/components/session/CompletionView";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import confetti from "canvas-confetti";
-import { hapticLight, hapticMedium, hapticSuccess, hapticHeavy, hapticCelebration, hapticGravity } from "@/lib/utils/haptics";
+import { hapticLight, hapticMedium, hapticCelebration, hapticGravity } from "@/lib/utils/haptics";
 
 const BeadScene = dynamic(
   () => import("@/components/session/BeadScene").then((mod) => mod.BeadScene),
@@ -470,9 +470,9 @@ function SessionContent() {
   if (!isMounted || !isActuallyHydrated) {
     return (
       <div className="fixed inset-0 bg-slate-950 flex items-center justify-center">
-        <motion.div animate={{ opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-slate-500 font-light tracking-widest uppercase text-xs">
+        <div className="text-slate-600 font-light tracking-widest uppercase text-xs opacity-50">
           Chapelet Digital
-        </motion.div>
+        </div>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { CircleCheck, RefreshCw, BookOpen, Sparkles } from "lucide-react";
+import { CircleCheck, RefreshCw, BookOpen } from "lucide-react";
 import { useEffect, useRef, useId } from "react";
 import confetti from "canvas-confetti";
 import { useTranslation } from "@/lib/hooks/useTranslation";
@@ -66,9 +66,12 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
             hapticGravity();
         }, 300);
 
-        // Subdued sparkling vibration
+        // 3 subtle haptic pings then stop
+        let pingCount = 0;
         const sparkleInterval = setInterval(() => {
             hapticLight();
+            pingCount++;
+            if (pingCount >= 3) clearInterval(sparkleInterval);
         }, 2000);
 
         return () => {
@@ -99,27 +102,15 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
             onTouchEnd={stopAllBubbles}
         >
             <div className="relative w-full overflow-hidden bg-slate-900/95 backdrop-blur-3xl border border-white/20 rounded-[2.5rem] p-8 sm:p-10 shadow-[0_0_50px_rgba(0,0,0,0.6)]">
-                {/* Celestial Background Elements — décoratifs, cachés de VoiceOver */}
+                {/* Celestial Background Elements — statiques, pas d'animation infinie */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                    <motion.div
-                        animate={shouldReduceMotion ? { opacity: 0.15 } : {
-                            scale: [1, 1.2, 1],
-                            opacity: [0.15, 0.3, 0.15],
-                            rotate: [0, 90, 0]
-                        }}
-                        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                        className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full blur-[40px]"
-                        style={{ backgroundColor: `${beadColor}66` }}
+                    <div
+                        className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full blur-[40px] opacity-[0.15]"
+                        style={{ backgroundColor: beadColor }}
                     />
-                    <motion.div
-                        animate={shouldReduceMotion ? { opacity: 0.1 } : {
-                            scale: [1.2, 1, 1.2],
-                            opacity: [0.1, 0.2, 0.1],
-                            rotate: [0, -90, 0]
-                        }}
-                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                        className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full blur-[60px]"
-                        style={{ backgroundColor: `${beadColor}33` }}
+                    <div
+                        className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full blur-[60px] opacity-[0.10]"
+                        style={{ backgroundColor: beadColor }}
                     />
                 </div>
 
@@ -136,18 +127,12 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                         }}
                         className="relative z-20 w-24 h-24 flex items-center justify-center"
                     >
-                        {/* Rotating Rings */}
-                        <motion.div
-                            animate={shouldReduceMotion ? { rotate: 0 } : { rotate: 360 }}
-                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                        {/* Static rings — plus de rotation infinie */}
+                        <div
                             className="absolute inset-0 rounded-[1.8rem] border-2 border-dashed"
                             style={{ borderColor: `${beadColor}4d` }}
                         />
-                        <motion.div
-                            animate={shouldReduceMotion ? { rotate: 0 } : { rotate: -360 }}
-                            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-2 rounded-[1.5rem] border border-white/10"
-                        />
+                        <div className="absolute inset-2 rounded-[1.5rem] border border-white/10" />
 
                         {/* Inner Jewel */}
                         <div
@@ -169,39 +154,6 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                         </div>
                     </motion.div>
 
-                    {/* Sparkling Aura */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className="absolute inset-0 z-10"
-                    >
-                        {[...Array(6)].map((_, i) => (
-                            <motion.div
-                                key={i}
-                                className="absolute"
-                                initial={{
-                                    x: "50%",
-                                    y: "50%",
-                                    scale: 0,
-                                    rotate: i * 60
-                                }}
-                                animate={{
-                                    x: `${50 + Math.cos(i * 60 * Math.PI / 180) * 60}%`,
-                                    y: `${50 + Math.sin(i * 60 * Math.PI / 180) * 60}%`,
-                                    scale: [0, 1, 0]
-                                }}
-                                transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    delay: i * 0.2 + 0.5,
-                                    ease: "easeOut"
-                                }}
-                            >
-                                <Sparkles size={12} style={{ color: beadColor }} className="drop-shadow-2xl" />
-                            </motion.div>
-                        ))}
-                    </motion.div>
                 </div>
 
                 <div className="space-y-2 mb-8 relative z-10 transition-all">
