@@ -5,6 +5,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { LayoutDashboard, Sparkles, BookOpen, Settings, MoreHorizontal } from "lucide-react";
 import { useSessionStore } from "@/lib/store/sessionStore";
+import { Suspense, useState, useEffect } from "react";
+import { useTranslation } from "@/lib/hooks/useTranslation";
 
 const navItems = (t: any) => [
     { href: "/", label: t.nav.home, icon: LayoutDashboard },
@@ -14,20 +16,24 @@ const navItems = (t: any) => [
     { href: "/settings", label: t.nav.more, icon: MoreHorizontal },
 ];
 
-import { Suspense } from "react";
-import { useTranslation } from "@/lib/hooks/useTranslation";
-
 function BottomNavContent() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const { hapticsEnabled } = useSessionStore();
     const { t } = useTranslation();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const items = navItems(t);
+    const viewParam = searchParams.get('view');
+    const isSettings = pathname === "/settings";
 
     const handleHaptic = () => {
         if (hapticsEnabled && typeof navigator !== 'undefined' && navigator.vibrate) {
-            navigator.vibrate(10); // Léger retour haptique
+            navigator.vibrate(10);
         }
     };
 
@@ -36,18 +42,18 @@ function BottomNavContent() {
             <div className="max-w-md mx-auto flex items-center justify-around px-4">
                 {items.map((item) => {
                     const Icon = item.icon;
-                    // Check if current path matches item.href base path
-                    // Special handling for preferences to distinguish from /settings
-                    const isPreferences = item.href.includes("view=preferences");
-                    const isSettings = pathname === "/settings";
-                    const hasPreferencesParam = searchParams.get('view') === 'preferences';
+                    // Strict active check
+                    const isPreferencesItem = item.href.includes("view=preferences");
+                    const isSettingsItem = item.href === "/settings";
 
                     let isActive = false;
-                    if (item.href === "/" && pathname === "/") isActive = true;
-                    else if (item.href === "/session" && pathname.startsWith("/session")) isActive = true;
-                    else if (item.href === "/library" && pathname.startsWith("/library")) isActive = true;
-                    else if (isPreferences) isActive = isSettings && hasPreferencesParam;
-                    else if (item.href === "/settings") isActive = isSettings && !hasPreferencesParam;
+                    if (mounted) {
+                        if (item.href === "/" && pathname === "/") isActive = true;
+                        else if (item.href === "/session" && pathname.startsWith("/session")) isActive = true;
+                        else if (item.href === "/library" && pathname.startsWith("/library")) isActive = true;
+                        else if (isPreferencesItem) isActive = isSettings && viewParam === 'preferences';
+                        else if (isSettingsItem) isActive = isSettings && viewParam !== 'preferences';
+                    }
 
                     return (
                         <Link
@@ -58,7 +64,6 @@ function BottomNavContent() {
                             aria-current={isActive ? "page" : undefined}
                             className="relative flex flex-col items-center justify-center gap-1 min-w-[64px] py-1 group touch-manipulation"
                         >
-                            {/* Icon avec transition de couleur */}
                             <motion.div
                                 whileTap={{ scale: 0.9 }}
                                 className={`relative z-10 transition-colors duration-300 ${isActive ? "text-indigo-600 dark:text-white" : "text-slate-600 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-400"}`}
@@ -70,15 +75,20 @@ function BottomNavContent() {
                                 />
                             </motion.div>
 
-                            {/* Label */}
                             <span
-                                className={`text-[10px] font-medium transition-colors duration-300 ${isActive
+                                className={`text-[11px] font-medium transition-colors duration-300 ${isActive
                                     ? "text-indigo-600 dark:text-white"
                                     : "text-slate-600 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-400"
                                     }`}
                             >
                                 {item.label}
                             </span>
+
+                            <div
+                                aria-hidden="true"
+                                className={`w-4 h-0.5 rounded-full transition-all duration-300 ${isActive ? "bg-indigo-500 dark:bg-white opacity-100" : "bg-transparent opacity-0"
+                                    }`}
+                            />
                         </Link>
                     );
                 })}
