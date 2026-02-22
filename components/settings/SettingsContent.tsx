@@ -22,9 +22,9 @@ const Shine = () => (
     <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent rounded-t-2xl" />
 );
 
-function SettingsInner() {
+function SettingsInner({ defaultView }: { defaultView?: SettingsView }) {
     const searchParams = useSearchParams();
-    const paramView = searchParams.get('view') === 'preferences' ? 'preferences' : 'menu';
+    const paramView = defaultView ?? (searchParams.get('view') === 'preferences' ? 'preferences' : 'menu');
     const [view, setView] = useState<SettingsView>(paramView);
     const { t, language } = useTranslation();
     const {
@@ -263,10 +263,10 @@ function SettingsInner() {
     );
 }
 
-export function SettingsContent() {
+export function SettingsContent({ defaultView }: { defaultView?: SettingsView }) {
     return (
         <Suspense fallback={<div className="flex-1 w-full h-full" style={{ background: "#010208" }} />}>
-            <SettingsInner />
+            <SettingsInner defaultView={defaultView} />
         </Suspense>
     );
 }

@@ -18,7 +18,7 @@ export const en = {
         session: "Session",
         library: "Library",
         preferences: "Preferences",
-        more: "More",
+        infos: "Info",
     },
     home: {
         greeting_morning: "Good morning",

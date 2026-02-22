@@ -17,7 +17,7 @@ export default function SupportPageEn() {
 
             <div className="flex-1 overflow-y-auto no-scrollbar touch-pan-y">
                 <main className="relative max-w-3xl mx-auto px-6 pt-[calc(env(safe-area-inset-top)+2rem)] pb-32 space-y-8">
-                    <Link href="/settings" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors mb-8" aria-label="Back to settings">
+                    <Link href="/infos" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors mb-8" aria-label="Back to settings">
                         <ArrowLeft size={20} />
                         <span>{t.common.back}</span>
                     </Link>
@@ -69,10 +69,10 @@ export default function SupportPageEn() {
                                 {t.support.faq.map((item, i) => {
                                     const faqStyles = [
                                         { bg: 'bg-emerald-100 dark:bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', icon: <Sparkles size={18} /> },
-                                        { bg: 'bg-blue-100 dark:bg-blue-500/10',    text: 'text-blue-600 dark:text-blue-400',    icon: <BookOpen size={18} /> },
+                                        { bg: 'bg-blue-100 dark:bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', icon: <BookOpen size={18} /> },
                                         { bg: 'bg-purple-100 dark:bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400', icon: <Smartphone size={18} /> },
-                                        { bg: 'bg-rose-100 dark:bg-rose-500/10',    text: 'text-rose-600 dark:text-rose-400',    icon: <Volume2 size={18} /> },
-                                        { bg: 'bg-amber-100 dark:bg-amber-500/10',  text: 'text-amber-600 dark:text-amber-400',  icon: <Palette size={18} /> },
+                                        { bg: 'bg-rose-100 dark:bg-rose-500/10', text: 'text-rose-600 dark:text-rose-400', icon: <Volume2 size={18} /> },
+                                        { bg: 'bg-amber-100 dark:bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', icon: <Palette size={18} /> },
                                     ];
                                     const style = faqStyles[i % faqStyles.length];
                                     return (

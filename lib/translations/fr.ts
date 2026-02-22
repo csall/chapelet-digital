@@ -18,7 +18,7 @@ export const fr = {
         session: "Session",
         library: "Biblio",
         preferences: "Préférences",
-        more: "Plus",
+        infos: "Infos",
     },
     home: {
         greeting_morning: "Bonjour",
