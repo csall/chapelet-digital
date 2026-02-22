@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Sparkles, BookOpen, Settings, MoreHorizontal, type LucideIcon } from "lucide-react";
-import { useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import { hapticLight } from "@/lib/utils/haptics";
+import { useSessionStore } from "@/lib/store/sessionStore";
 
 // ─── Static config ─────────────────────────────────────────
 const NAV_ITEMS: { href: string; labelKey: string; icon: LucideIcon }[] = [
@@ -31,22 +32,31 @@ function matchPath(pathname: string, href: string): boolean {
 export function BottomNav() {
     const pathname = usePathname();
     const { t } = useTranslation();
+    const [isMounted, setIsMounted] = useState(false);
+    const hasHydrated = useSessionStore(state => state._hasHydrated);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const onTap = useCallback(() => {
         hapticLight();
     }, []);
 
+    const isReady = isMounted && hasHydrated;
+
     return (
         <nav
             aria-label="Navigation principale"
             className={NAV_CLS}
-            suppressHydrationWarning
         >
             <div className="max-w-md mx-auto flex items-center justify-around px-2">
                 {NAV_ITEMS.map((item) => {
                     const active = matchPath(pathname, item.href);
                     const Icon = item.icon;
-                    const label = (t.nav as Record<string, string>)[item.labelKey] ?? item.labelKey;
+                    const label = isReady
+                        ? ((t.nav as Record<string, string>)[item.labelKey] ?? item.labelKey)
+                        : ""; // Empty label during hydration to prevent mismatch
 
                     return (
                         <Link
@@ -56,7 +66,6 @@ export function BottomNav() {
                             aria-label={label}
                             aria-current={active ? "page" : undefined}
                             className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 active:scale-95 transition-transform duration-100"
-                            suppressHydrationWarning
                         >
                             <Icon
                                 size={22}
@@ -67,11 +76,10 @@ export function BottomNav() {
                                 }
                             />
                             <span
-                                className={`text-[10px] font-medium leading-tight ${active
+                                className={`text-[10px] font-medium leading-tight h-4 flex items-center ${active
                                     ? "text-indigo-600 dark:text-white"
                                     : "text-slate-400 dark:text-slate-500"
                                     }`}
-                                suppressHydrationWarning
                             >
                                 {label}
                             </span>

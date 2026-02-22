@@ -5,8 +5,10 @@ import { useSessionStore } from "@/lib/store/sessionStore";
 
 export function ThemeProvider() {
     const theme = useSessionStore((state) => state.theme);
+    const hasHydrated = useSessionStore((state) => state._hasHydrated);
 
     useEffect(() => {
+        if (!hasHydrated) return;
         const root = document.documentElement;
 
         const applyTheme = (mode: 'dark' | 'light') => {
