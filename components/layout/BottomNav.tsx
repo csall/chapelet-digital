@@ -13,7 +13,7 @@ const NAV_ITEMS: { href: string; labelKey: string; icon: LucideIcon }[] = [
     { href: "/session", labelKey: "session", icon: Sparkles },
     { href: "/library", labelKey: "library", icon: BookOpen },
     { href: "/preferences", labelKey: "preferences", icon: Settings },
-    { href: "/infos", labelKey: "infos", icon: MoreHorizontal },
+    { href: "/about", labelKey: "infos", icon: MoreHorizontal },
 ];
 
 // ─── Shared nav classes ────────────────────────────────────

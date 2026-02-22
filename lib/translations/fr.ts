@@ -18,7 +18,7 @@ export const fr = {
         session: "Session",
         library: "Biblio",
         preferences: "Préférences",
-        infos: "Infos",
+        infos: "À propos",
     },
     home: {
         greeting_morning: "Bonjour",
@@ -71,7 +71,7 @@ export const fr = {
         delete: "Supprimer",
     },
     settings: {
-        title: "Plus",
+        title: "À propos",
         appearance: "Apparence",
         language: "Langue",
         beadColor: "Couleur des perles",

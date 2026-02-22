@@ -96,7 +96,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
     };
 
     return (
-        <div className="flex flex-col w-full h-[100dvh] overflow-hidden text-white relative">
+        <div className="flex flex-col w-full h-[100dvh] overflow-hidden text-slate-900 dark:text-white relative">
             <HomeBackground />
 
             {/* Immersive Mesh Glows - Keep some for extra depth if needed, or remove since HomeBackground has them */}
@@ -143,7 +143,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                         )}
                                     </div>
                                     <div>
-                                        <h2 className="text-2xl font-bold text-white tracking-tight">{t.library.title}</h2>
+                                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{t.library.title}</h2>
                                     </div>
                                 </div>
 
@@ -151,7 +151,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                     <button
                                         onClick={() => setIsSearching(true)}
                                         aria-label="Rechercher"
-                                        className="p-2.5 rounded-full hover:bg-white/5 text-white/50 active:scale-90 transition-all"
+                                        className="p-2.5 rounded-full hover:bg-slate-900/5 dark:hover:bg-white/5 text-slate-400 dark:text-white/50 active:scale-90 transition-all"
                                     >
                                         <Search size={22} aria-hidden="true" />
                                     </button>
@@ -163,7 +163,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                             onClick={() => setIsAddMenuOpen(v => !v)}
                                             aria-label="Ajouter une collection ou une invocation"
                                             aria-expanded={isAddMenuOpen}
-                                            className="p-2.5 rounded-full hover:bg-white/5 text-white/50 active:scale-90 transition-all"
+                                            className="p-2.5 rounded-full hover:bg-slate-900/5 dark:hover:bg-white/5 text-slate-400 dark:text-white/50 active:scale-90 transition-all"
                                         >
                                             <motion.div
                                                 animate={{ rotate: isAddMenuOpen ? 45 : 0 }}
@@ -247,7 +247,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                             <div className="relative flex-1 group">
                                 <Search
                                     size={18}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-white transition-colors duration-300"
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30 group-focus-within:text-slate-900 dark:group-focus-within:text-white transition-colors duration-300"
                                 />
                                 <input
                                     autoFocus
@@ -260,7 +260,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                     placeholder={t.common.search}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-white/[0.05] border border-white/5 rounded-2xl py-3 pl-11 pr-10 text-[15px] text-white placeholder:text-white/30 outline-none transition-all duration-300 focus:bg-white/10"
+                                    className="w-full bg-slate-900/5 dark:bg-white/[0.05] border border-slate-900/5 dark:border-white/5 rounded-2xl py-3 pl-11 pr-10 text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 outline-none transition-all duration-300 focus:bg-slate-900/10 dark:focus:bg-white/10"
                                 />
                                 {searchQuery && (
                                     <button
@@ -276,7 +276,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                     setIsSearching(false);
                                     setSearchQuery("");
                                 }}
-                                className="text-[15px] font-medium text-white/50 hover:text-white px-1 active:opacity-70 transition-all"
+                                className="text-[15px] font-medium text-slate-400 dark:text-white/50 hover:text-slate-900 dark:hover:text-white px-1 active:opacity-70 transition-all"
                             >
                                 {t.common.cancel}
                             </button>
@@ -306,14 +306,13 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                     color: beadColor,
                                 } : {
                                     backgroundColor: "transparent",
-                                    borderColor: "rgba(255,255,255,0.08)",
-                                    color: undefined,
+                                    borderColor: "rgba(128,128,128,0.1)",
                                 }}
                             >
-                                <span className={isActive ? "" : "text-white/30"}>
+                                <span className={isActive ? "" : "text-slate-400 dark:text-white/30"}>
                                     {tab.icon}
                                 </span>
-                                <span className={`text-[11px] font-bold leading-none ${isActive ? "" : "text-white/50"}`}>
+                                <span className={`text-[11px] font-bold leading-none ${isActive ? "" : "text-slate-500 dark:text-white/50"}`}>
                                     {tab.label}
                                 </span>
                                 <span
@@ -322,11 +321,12 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                         backgroundColor: beadColor + "30",
                                         color: beadColor,
                                     } : {
-                                        backgroundColor: "rgba(255,255,255,0.08)",
-                                        color: "rgba(255,255,255,0.3)",
+                                        backgroundColor: "rgba(128,128,128,0.1)",
                                     }}
                                 >
-                                    {tab.count}
+                                    <span className={isActive ? "" : "text-slate-500 dark:text-white/40"}>
+                                        {tab.count}
+                                    </span>
                                 </span>
                             </motion.button>
                         );
@@ -388,7 +388,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                 <div className="space-y-8">
                                     {favoriteGroups.length > 0 && (
                                         <div className="space-y-4">
-                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/25 px-1">{t.library.collections}</h3>
+                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/25 px-1">{t.library.collections}</h3>
                                             <CollectionSection
                                                 groups={favoriteGroups}
                                                 expandedId={expandedId}
@@ -405,7 +405,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                     )}
                                     {favoriteInvocations.length > 0 && (
                                         <div className="space-y-4">
-                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/25 px-1">{t.library.invocations}</h3>
+                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/25 px-1">{t.library.invocations}</h3>
                                             <FavoriteSection
                                                 invocations={favoriteInvocations}
                                                 onSessionStart={onSessionStart}
@@ -423,10 +423,10 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                             ) : (
                                 <div className="text-center py-20 px-6 bg-white/[0.03] border border-dashed border-white/10 rounded-[2rem]">
                                     <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6 opacity-30">
-                                        <Star size={24} className="text-white/40" />
+                                        <Star size={24} className="text-slate-300 dark:text-white/40" />
                                     </div>
                                     <p className="text-base font-bold text-white">{t.library.noFavorites}</p>
-                                    <p className="text-xs text-white/40 mt-2 max-w-[200px] mx-auto leading-relaxed">{t.library.addFavoriteTip}</p>
+                                    <p className="text-xs text-slate-400 dark:text-white/40 mt-2 max-w-[200px] mx-auto leading-relaxed">{t.library.addFavoriteTip}</p>
                                 </div>
                             )}
                         </motion.div>
@@ -484,12 +484,12 @@ function FavoriteSection({ invocations, onSessionStart, onDelete, onEdit, onTogg
                                 {/* Text */}
                                 <div className="flex-1 min-w-0">
                                     <p
-                                        className={`text-[15px] font-semibold text-white/90 leading-tight transition-all duration-300 ${isExpanded ? "whitespace-normal break-words overflow-visible" : "truncate"}`}
+                                        className={`text-[15px] font-semibold text-slate-900 dark:text-white/90 leading-tight transition-all duration-300 ${isExpanded ? "whitespace-normal break-words overflow-visible" : "truncate"}`}
                                     >
                                         {resolve(invocation.name)}
                                     </p>
                                     {invocation.description && (
-                                        <p className={`text-[12.5px] text-white/40 mt-0.5 leading-snug transition-all duration-300 ${isExpanded ? "whitespace-normal break-words" : "line-clamp-1"}`}>
+                                        <p className={`text-[12.5px] text-slate-500 dark:text-white/40 mt-0.5 leading-snug transition-all duration-300 ${isExpanded ? "whitespace-normal break-words" : "line-clamp-1"}`}>
                                             {resolve(invocation.description)}
                                         </p>
                                     )}
@@ -507,7 +507,7 @@ function FavoriteSection({ invocations, onSessionStart, onDelete, onEdit, onTogg
                                         animate={{ rotate: isExpanded ? 180 : 0 }}
                                         transition={{ duration: 0.25, ease: "easeInOut" }}
                                     >
-                                        <ChevronDown size={16} className="text-white/20" />
+                                        <ChevronDown size={16} className="text-slate-300 dark:text-white/20" />
                                     </motion.div>
                                 </div>
                             </button>
@@ -570,8 +570,8 @@ function FavoriteSection({ invocations, onSessionStart, onDelete, onEdit, onTogg
                     <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4 opacity-40">
                         <BookOpen size={24} className="text-white/40" />
                     </div>
-                    <p className="text-sm font-bold text-white/60 mb-1">{t.common.noResults}</p>
-                    <p className="text-xs text-white/30">{t.common.tryAnother}</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white/60 mb-1">{t.common.noResults}</p>
+                    <p className="text-xs text-slate-400 dark:text-white/30">{t.common.tryAnother}</p>
                 </div>
             )}
         </div>
@@ -586,8 +586,8 @@ function CollectionSection({ groups, expandedId, onToggleExpand, onSessionStart,
                 <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-5 opacity-40">
                     <Sparkles size={28} className="text-white/40" />
                 </div>
-                <p className="text-sm font-bold text-white/50 mb-2">{t.common.noResults}</p>
-                <p className="text-xs text-white/30">{t.library.newCollection}</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white/50 mb-2">{t.common.noResults}</p>
+                <p className="text-xs text-slate-400 dark:text-white/30">{t.library.newCollection}</p>
             </div>
         );
     }
@@ -622,12 +622,12 @@ function CollectionSection({ groups, expandedId, onToggleExpand, onSessionStart,
                             {/* Text */}
                             <div className="flex-1 min-w-0">
                                 <p
-                                    className={`text-[15px] font-semibold text-white/90 leading-tight transition-all duration-300 ${isExpanded ? "whitespace-normal break-words overflow-visible" : "truncate"}`}
+                                    className={`text-[15px] font-semibold text-slate-900 dark:text-white/90 leading-tight transition-all duration-300 ${isExpanded ? "whitespace-normal break-words overflow-visible" : "truncate"}`}
                                 >
                                     {resolve(group.name)}
                                 </p>
                                 {group.description && (
-                                    <p className={`text-[12.5px] text-white/40 mt-0.5 leading-snug transition-all duration-300 ${isExpanded ? "whitespace-normal break-words" : "line-clamp-1"}`}>
+                                    <p className={`text-[12.5px] text-slate-500 dark:text-white/40 mt-0.5 leading-snug transition-all duration-300 ${isExpanded ? "whitespace-normal break-words" : "line-clamp-1"}`}>
                                         {resolve(group.description)}
                                     </p>
                                 )}
@@ -679,7 +679,7 @@ function CollectionSection({ groups, expandedId, onToggleExpand, onSessionStart,
                                                                 {i + 1}
                                                             </span>
                                                             <span
-                                                                className="flex-1 text-[13px] text-white/70 font-medium whitespace-normal break-words"
+                                                                className="flex-1 text-[13px] text-slate-600 dark:text-white/70 font-medium whitespace-normal break-words"
                                                             >
                                                                 {resolve(invData?.name)}
                                                             </span>

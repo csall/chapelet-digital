@@ -18,7 +18,7 @@ export const en = {
         session: "Session",
         library: "Library",
         preferences: "Preferences",
-        infos: "Info",
+        infos: "About",
     },
     home: {
         greeting_morning: "Good morning",
@@ -71,7 +71,7 @@ export const en = {
         delete: "Delete",
     },
     settings: {
-        title: "More",
+        title: "About",
         appearance: "Appearance",
         language: "Language",
         beadColor: "Bead Color",
