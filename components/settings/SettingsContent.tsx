@@ -12,7 +12,6 @@ import { useState, useEffect, Suspense } from "react";
 import { useSessionStore } from "@/lib/store/sessionStore";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/lib/hooks/useTranslation";
-import { HomeBackground } from "@/components/home/HomeBackground";
 import { hapticLight } from "@/lib/utils/haptics";
 
 type SettingsView = 'menu' | 'preferences';
@@ -27,10 +26,15 @@ function SettingsInner({ defaultView }: { defaultView?: SettingsView }) {
     const paramView = defaultView ?? (searchParams.get('view') === 'preferences' ? 'preferences' : 'menu');
     const [view, setView] = useState<SettingsView>(paramView);
     const { t, language } = useTranslation();
-    const {
-        soundEnabled, hapticsEnabled, toggleSound, toggleHaptics,
-        beadColor, setBeadColor, theme, setTheme, setLanguage
-    } = useSessionStore();
+    const soundEnabled = useSessionStore(s => s.soundEnabled);
+    const hapticsEnabled = useSessionStore(s => s.hapticsEnabled);
+    const toggleSound = useSessionStore(s => s.toggleSound);
+    const toggleHaptics = useSessionStore(s => s.toggleHaptics);
+    const beadColor = useSessionStore(s => s.beadColor);
+    const setBeadColor = useSessionStore(s => s.setBeadColor);
+    const theme = useSessionStore(s => s.theme);
+    const setTheme = useSessionStore(s => s.setTheme);
+    const setLanguage = useSessionStore(s => s.setLanguage);
 
     useEffect(() => { setView(paramView); }, [paramView]);
 
@@ -73,7 +77,12 @@ function SettingsInner({ defaultView }: { defaultView?: SettingsView }) {
 
     return (
         <div className="flex flex-col w-full h-[100dvh] overflow-hidden text-white relative">
-            <HomeBackground />
+            {/* Lightweight CSS background — no WebGL */}
+            <div className="fixed inset-0 -z-10 bg-[#010208]">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/40 via-slate-950 to-rose-950/20" />
+                <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-500/[0.06] rounded-full blur-[100px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-rose-500/[0.04] rounded-full blur-[100px]" />
+            </div>
 
             <AnimatePresence mode="wait">
 

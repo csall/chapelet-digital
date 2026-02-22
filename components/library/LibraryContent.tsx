@@ -9,7 +9,6 @@ import { CreateInvocationModal } from "@/components/library/CreateInvocationModa
 import { CreateGroupModal } from "@/components/library/CreateGroupModal";
 import { useSessionStore } from "@/lib/store/sessionStore";
 import { useTranslation } from "@/lib/hooks/useTranslation";
-import { HomeBackground } from "@/components/home/HomeBackground";
 
 const glassCard = "relative bg-white/[0.042] backdrop-blur-xl border border-white/[0.07] rounded-3xl";
 const Shine = () => (
@@ -97,7 +96,12 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
 
     return (
         <div className="flex flex-col w-full h-[100dvh] overflow-hidden text-slate-900 dark:text-white relative">
-            <HomeBackground />
+            {/* Lightweight CSS background — no WebGL */}
+            <div className="fixed inset-0 -z-10 bg-[#010208]">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/40 via-slate-950 to-rose-950/20" />
+                <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-500/[0.06] rounded-full blur-[100px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-rose-500/[0.04] rounded-full blur-[100px]" />
+            </div>
 
             {/* Immersive Mesh Glows - Keep some for extra depth if needed, or remove since HomeBackground has them */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 opacity-30">

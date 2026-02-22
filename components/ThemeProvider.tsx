@@ -33,7 +33,7 @@ export function ThemeProvider() {
             mq.addEventListener('change', handler);
             return () => mq.removeEventListener('change', handler);
         }
-    }, [theme]);
+    }, [theme, hasHydrated]);
 
     return null;
 }

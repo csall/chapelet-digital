@@ -17,6 +17,7 @@ import { getRandomQuote } from "@/lib/data/quotes";
 import { HomeBackground } from "@/components/home/HomeBackground";
 import { HomeBeadScene } from "@/components/home/HomeBeadScene";
 import { useTranslation } from "@/lib/hooks/useTranslation";
+import { CanvasErrorBoundary } from "@/components/ui/CanvasErrorBoundary";
 
 /* ─── Greeting Logic ──────────────────────────────── */
 function getGreeting() {
@@ -61,7 +62,9 @@ export default function HomePage() {
 
   return (
     <div className="h-[100dvh] text-slate-100 flex flex-col relative overflow-hidden touch-none font-sans select-none">
-      <HomeBackground />
+      <CanvasErrorBoundary>
+        <HomeBackground />
+      </CanvasErrorBoundary>
 
       <main className="flex-1 px-5 pt-[calc(env(safe-area-inset-top,24px)+0.75rem)] pb-[calc(env(safe-area-inset-bottom,20px)+5.5rem)] flex flex-col z-10 max-w-[420px] mx-auto w-full h-full justify-between items-center overflow-hidden">
 
@@ -139,7 +142,9 @@ export default function HomePage() {
           {/* Canvas — prend l'espace disponible */}
           <div className="flex-1 w-full flex items-center justify-center min-h-0 pointer-events-none">
             <div className="w-full h-full max-w-[300px] max-h-[38vh]">
-              <HomeBeadScene cameraY={0} />
+              <CanvasErrorBoundary fallback={<div className="w-full h-full" />}>
+                <HomeBeadScene cameraY={0} />
+              </CanvasErrorBoundary>
             </div>
           </div>
 
