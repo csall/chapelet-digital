@@ -184,7 +184,7 @@ const ShootingStar = () => {
     const [active, setActive] = useState(false);
     const prefersReducedMotion = useMemo(() =>
         typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    []);
+        []);
 
     // Randomize start delay and position
     const reset = useCallback(() => {
@@ -296,20 +296,7 @@ const StarryNightBackground = memo(() => {
     }
 
     return (
-        <group>
-            {/* Deep Universe background - Reduced for mobile */}
-            <Stars radius={250} depth={100} count={1500} factor={4} saturation={1} fade speed={0.1} />
-            <Stars radius={100} depth={50} count={500} factor={3} saturation={0} fade speed={0.5} />
-
-            {/* Floating spiritual dust - Gold & Blue */}
-            <Sparkles count={40} scale={25} size={2} speed={0.2} opacity={0.15} color="#fbbf24" />
-            <Sparkles count={60} scale={35} size={4} speed={0.1} opacity={0.08} color="#6366f1" />
-
-            {/* Periodic shooting stars */}
-            <ShootingStar />
-            <ShootingStar />
-            <ShootingStar />
-        </group>
+        <group />
     );
 });
 StarryNightBackground.displayName = "StarryNightBackground";
@@ -549,7 +536,7 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
                 gl={{
                     antialias: false,
                     alpha: true,
-                    powerPreference: "high-performance",
+                    powerPreference: "default",
                     preserveDrawingBuffer: true
                 }}
                 dpr={[1, 2]}

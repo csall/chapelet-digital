@@ -25,20 +25,21 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
     useEffect(() => {
         if (shouldReduceMotion) return; // Ne pas lancer de confettis si réduction de mouvement activée
         if (!confettiLaunched.current) {
-            const duration = isIntermediary ? 2.5 * 1000 : 5 * 1000;
+            const duration = isIntermediary ? 2 * 1000 : 4 * 1000;
             const animationEnd = Date.now() + duration;
             const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
             const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-            const interval: any = setInterval(function () {
+            const interval = setInterval(() => {
                 const timeLeft = animationEnd - Date.now();
 
                 if (timeLeft <= 0) {
-                    return clearInterval(interval);
+                    clearInterval(interval);
+                    return;
                 }
 
-                const particleCount = 50 * (timeLeft / duration);
+                const particleCount = 20 * (timeLeft / duration);
                 // since particles fall down, start a bit higher than random
                 confetti({
                     ...defaults,
@@ -52,11 +53,12 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                     origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
                     colors: [beadColor, '#ffffff']
                 });
-            }, 250);
+            }, 400);
 
             confettiLaunched.current = true;
+            return () => clearInterval(interval);
         }
-    }, [beadColor, isIntermediary]);
+    }, [beadColor, isIntermediary, shouldReduceMotion]);
 
     useEffect(() => {
         // Trigger Gravity haptic for the central "jewel" reveal
@@ -100,7 +102,7 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                 {/* Celestial Background Elements — décoratifs, cachés de VoiceOver */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
                     <motion.div
-                        animate={{
+                        animate={shouldReduceMotion ? { opacity: 0.15 } : {
                             scale: [1, 1.2, 1],
                             opacity: [0.15, 0.3, 0.15],
                             rotate: [0, 90, 0]
@@ -110,7 +112,7 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                         style={{ backgroundColor: `${beadColor}66` }}
                     />
                     <motion.div
-                        animate={{
+                        animate={shouldReduceMotion ? { opacity: 0.1 } : {
                             scale: [1.2, 1, 1.2],
                             opacity: [0.1, 0.2, 0.1],
                             rotate: [0, -90, 0]
@@ -136,13 +138,13 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                     >
                         {/* Rotating Rings */}
                         <motion.div
-                            animate={{ rotate: 360 }}
+                            animate={shouldReduceMotion ? { rotate: 0 } : { rotate: 360 }}
                             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                             className="absolute inset-0 rounded-[1.8rem] border-2 border-dashed"
                             style={{ borderColor: `${beadColor}4d` }}
                         />
                         <motion.div
-                            animate={{ rotate: -360 }}
+                            animate={shouldReduceMotion ? { rotate: 0 } : { rotate: -360 }}
                             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
                             className="absolute inset-2 rounded-[1.5rem] border border-white/10"
                         />
@@ -157,11 +159,11 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                         >
                             <CircleCheck size={36} className="text-slate-950 stroke-[2]" />
                             <motion.div
-                                animate={{
+                                animate={shouldReduceMotion ? {} : {
                                     x: ['-200%', '200%'],
                                     opacity: [0, 1, 0]
                                 }}
-                                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                                transition={{ duration: 2, repeat: 2, repeatDelay: 1 }}
                                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
                             />
                         </div>

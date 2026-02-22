@@ -207,6 +207,7 @@ input[type="search"]::-webkit-search-results-decoration {
 
 /* ── Reduced Motion ───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -323,6 +324,13 @@ canvas {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float {
+    animation: none;
+  }
 }
 
 /* Glassmorphism Premium */
@@ -389,19 +397,7 @@ canvas {
   position: absolute;
   inset: 0;
   background: linear-gradient(125deg, transparent 40%, rgba(255, 255, 255, 0.08) 50%, transparent 60%);
-  background-size: 200% 200%;
-  animation: shine-sweep 8s ease-in-out infinite;
   pointer-events: none;
-}
-
-@keyframes shine-sweep {
-  0% {
-    background-position: -200% -200%;
-  }
-
-  100% {
-    background-position: 200% 200%;
-  }
 }
 
 [data-theme="light"] .glass {
@@ -490,16 +486,26 @@ canvas {
 
 /* ── Glow pulse ───────────────────────────────────────────── */
 @keyframes glow-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(129, 140, 248, 0.2), 0 0 40px rgba(129, 140, 248, 0.1);
   }
+
   50% {
     box-shadow: 0 0 40px rgba(129, 140, 248, 0.4), 0 0 80px rgba(129, 140, 248, 0.2);
   }
 }
 
 .animate-glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite;
+  animation: glow-pulse 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-glow-pulse {
+    animation: none;
+  }
 }
 
 /* ── Aurora sweep ─────────────────────────────────────────── */
@@ -507,9 +513,11 @@ canvas {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -517,8 +525,17 @@ canvas {
 
 /* ── Slow pulse (for 3D glows) ────────────────────────────── */
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50%       { opacity: 0.75; transform: scale(1.12); }
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.75;
+    transform: scale(1.12);
+  }
 }
 
 .animate-pulse-slow {

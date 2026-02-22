@@ -142,7 +142,7 @@ export const HomeBeadScene = memo(({ cameraY = 0 }: { cameraY?: number }) => (
     <Canvas
         dpr={[1, 1.5]}
         camera={{ position: [0, cameraY, 6], fov: 44 }}
-        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+        gl={{ alpha: true, antialias: true, powerPreference: 'default' }}
         style={{ background: 'transparent', width: '100%', height: '100%' }}
     >
         <ambientLight intensity={0.3} />

@@ -438,7 +438,7 @@ function SessionContent() {
         playSuccess();
         hapticGravity();
         confetti({
-          particleCount: 40,
+          particleCount: 20,
           spread: 70,
           origin: { y: 0.2 },
           colors: [beadColor, '#ffffff']
@@ -452,7 +452,7 @@ function SessionContent() {
       playSuccess();
       hapticGravity();
       confetti({
-        particleCount: 50,
+        particleCount: 20,
         spread: 80,
         origin: { y: 0.3 },
         colors: [beadColor, '#ffd700', '#ffffff']
@@ -479,18 +479,14 @@ function SessionContent() {
 
   return (
     <div className="fixed inset-0 h-[100dvh] max-h-[100dvh] bg-slate-950 text-slate-100 overflow-hidden font-sans select-none flex flex-col touch-none">
-      {/* Immersive mesh glows */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 bg-slate-950/20">
-        <motion.div
-          animate={{ scale: [1, 1.4, 1], opacity: [0.08, 0.15, 0.08], x: [0, 50, 0], y: [0, -50, 0], rotate: [0, 45, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -right-[15%] w-[90%] h-[70%] blur-[140px] rounded-full"
+      {/* Static ambient glows — no animation for energy savings */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 bg-slate-950">
+        <div
+          className="absolute -top-[10%] -right-[15%] w-[90%] h-[70%] blur-[140px] rounded-full opacity-[0.1]"
           style={{ backgroundColor: beadColor }}
         />
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.04, 0.08, 0.04], x: [0, -30, 0], y: [0, 40, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-[10%] -left-[20%] w-[100%] h-[80%] bg-indigo-600 blur-[150px] rounded-full"
+        <div
+          className="absolute bottom-[10%] -left-[20%] w-[100%] h-[80%] bg-indigo-600 blur-[150px] rounded-full opacity-[0.05]"
         />
       </div>
 

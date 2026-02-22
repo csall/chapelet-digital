@@ -69,7 +69,7 @@ export default function HomePage() {
         <div className="absolute top-[30%] left-[20%] w-[40%] h-[40%] bg-violet-500/[0.04] rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
       </div>
 
-      <main className="flex-1 px-5 pt-[calc(env(safe-area-inset-top,24px)+0.75rem)] pb-[calc(env(safe-area-inset-bottom,20px)+5.5rem)] flex flex-col z-10 max-w-[420px] mx-auto w-full h-full justify-between items-center overflow-hidden">
+      <main className="flex-1 px-5 pt-[calc(env(safe-area-inset-top,24px)+0.75rem)] pb-[calc(env(safe-area-inset-bottom,20px)+5.5rem)] flex flex-col z-10 max-w-[420px] mx-auto w-full h-full items-center overflow-hidden">
 
         {/* ── HEADER ──────────────────────────────── */}
         <div className="w-full shrink-0">
@@ -125,97 +125,100 @@ export default function HomePage() {
           </motion.div>
         </div>
 
-        {/* ── CHAPELET FLOTTANT ────────────────────── */}
-        <div className="flex-1 w-full flex flex-col items-center min-h-0 relative">
-          {/* Halo indigo */}
+        {/* ── CENTRAL QUOTE AREA ────────────────────── */}
+        <div className="flex-1 w-full flex flex-col items-center justify-end pb-4 min-h-0 relative">
+          {/* Soft ambient glow */}
           <motion.div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.14) 0%, transparent 66%)" }}
-            animate={{ opacity: [0.4, 0.85, 0.4] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          />
-          {/* Halo rose */}
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse at 55% 45%, rgba(244,114,182,0.07) 0%, transparent 60%)" }}
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] pointer-events-none"
+            style={{
+              background: "radial-gradient(circle at center, rgba(99,102,241,0.1) 0%, transparent 65%)"
+            }}
+            animate={{ opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
 
-          {/* Canvas — prend l'espace disponible */}
-          <div className="flex-1 w-full flex items-center justify-center min-h-0 pointer-events-none">
-            <div className="w-full h-full max-w-[300px] max-h-[38vh]">
-              <CanvasErrorBoundary fallback={<div className="w-full h-full" />}>
-                <HomeBeadScene cameraY={0} />
-              </CanvasErrorBoundary>
-            </div>
-          </div>
-
-          {/* ── Citation ── juste sous le chapelet ── */}
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
-            className="shrink-0 w-full text-center px-6 pb-3"
+            transition={{ delay: 0.3, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="shrink-0 w-full text-center px-6 relative z-20"
           >
-            <div className="w-8 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent mx-auto mb-2.5" />
-            <p className="text-[12px] leading-[1.6] text-white/55 font-light italic line-clamp-2">
+            <p className="text-[17px] sm:text-[19px] leading-[1.65] text-white/75 font-light italic">
               &ldquo;{resolve(dailyQuote.text)}&rdquo;
             </p>
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 mt-1.5 block">
-              {resolve(dailyQuote.source)}
-            </span>
+
+            <div className="flex items-center justify-center gap-3 mt-5">
+              <div className="h-px w-6 bg-gradient-to-r from-transparent to-white/15" />
+              <span className="text-[9px] font-black uppercase tracking-[0.5em] text-white/25">
+                {resolve(dailyQuote.source)}
+              </span>
+              <div className="h-px w-6 bg-gradient-to-l from-transparent to-white/15" />
+            </div>
           </motion.div>
         </div>
 
         {/* ── BLOC BAS : info + actions ────────────── */}
-        <div className="w-full shrink-0 flex flex-col gap-3 pb-4">
+        <div className="w-full shrink-0 flex flex-col gap-2.5 pt-3 pb-4">
 
-          {/* Carte info */}
+          {/* Carte progression */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full rounded-[26px] p-4"
+            className="w-full rounded-[22px] p-4"
             style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
             }}
           >
             {hasActiveSession ? (
-              <>
-                <p className="text-[8px] font-black uppercase tracking-[0.45em] text-white/25 mb-1.5">
-                  {t.home.progression}
-                </p>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-bold text-white tabular-nums leading-none">
-                    {Math.round(progress * 100)}
-                    <span className="text-sm text-white/25 ml-0.5">%</span>
+              <div className="flex items-center gap-4">
+                {/* Circular progress */}
+                <div className="relative w-14 h-14 shrink-0">
+                  <svg className="w-full h-full -rotate-90">
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                    <motion.circle
+                      cx="28" cy="28" r="24" fill="none"
+                      stroke="url(#progressGrad)"
+                      strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${progress * 150.8} 150.8`}
+                      initial={{ strokeDasharray: "0 150.8" }}
+                      animate={{ strokeDasharray: `${progress * 150.8} 150.8` }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                    />
+                    <defs>
+                      <linearGradient id="progressGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#818cf8" />
+                        <stop offset="100%" stopColor="#a78bfa" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-[13px] font-black text-white tabular-nums">
+                    {Math.round(progress * 100)}%
                   </span>
-                  <span className="ml-auto text-[10px] text-white/30 italic truncate max-w-[150px]">
+                </div>
+
+                {/* Info + CTA */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/25 mb-1">
+                    {t.home.progression}
+                  </p>
+                  <p className="text-xs text-white/50 truncate mb-2.5 italic">
                     &laquo;{resolve(preset?.name)}&raquo;
-                  </span>
+                  </p>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => router.push("/session")}
+                    aria-label={`Continue session — ${Math.round(progress * 100)}% complete`}
+                    className="w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] text-center transition-all"
+                    style={{ background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc" }}
+                  >
+                    {t.common.continue} →
+                  </motion.button>
                 </div>
-                <div className="h-[2px] w-full bg-white/[0.07] rounded-full overflow-hidden mb-4">
-                  <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-400"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress * 100}%` }}
-                    transition={{ duration: 0.9, ease: "easeOut" }}
-                  />
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => router.push("/session")}
-                  aria-label={`Continue session — ${Math.round(progress * 100)}% complete`}
-                  className="w-full py-[10px] rounded-[14px] text-[10px] font-black uppercase tracking-[0.35em] text-center"
-                  style={{ background: "rgba(99,102,241,0.18)", border: "1px solid rgba(99,102,241,0.28)", color: "#a5b4fc" }}
-                >
-                  {t.common.continue} →
-                </motion.button>
-              </>
+              </div>
             ) : (
               <motion.button
                 whileTap={{ scale: 0.95 }}
