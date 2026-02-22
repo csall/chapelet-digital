@@ -2,20 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Sparkles, BookOpen, Settings, MoreHorizontal } from "lucide-react";
-import { useState, useEffect, useCallback, memo, useRef } from "react";
+import { LayoutDashboard, Sparkles, BookOpen, Settings, MoreHorizontal, type LucideIcon } from "lucide-react";
+import { useCallback } from "react";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import { hapticLight } from "@/lib/utils/haptics";
 
-// ─── Nav item type ─────────────────────────────────────────
-type NavItem = {
-    href: string;
-    labelKey: "home" | "session" | "library" | "preferences" | "infos";
-    icon: typeof LayoutDashboard;
-};
-
-// Static config — no translation dependency at definition time
-const NAV_ITEMS: NavItem[] = [
+// ─── Static config ─────────────────────────────────────────
+const NAV_ITEMS: { href: string; labelKey: string; icon: LucideIcon }[] = [
     { href: "/", labelKey: "home", icon: LayoutDashboard },
     { href: "/session", labelKey: "session", icon: Sparkles },
     { href: "/library", labelKey: "library", icon: BookOpen },
@@ -23,117 +16,71 @@ const NAV_ITEMS: NavItem[] = [
     { href: "/infos", labelKey: "infos", icon: MoreHorizontal },
 ];
 
-// Hardcoded French labels for SSR — must match the Zustand default language ('fr')
-const SSR_LABELS: Record<NavItem["labelKey"], string> = {
-    home: "Accueil",
-    session: "Session",
-    library: "Biblio",
-    preferences: "Préférences",
-    infos: "Infos",
-};
+// ─── Shared nav classes ────────────────────────────────────
+const NAV_CLS =
+    "fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/85 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 pb-[env(safe-area-inset-bottom,20px)] pt-2.5 select-none";
 
-// ─── Shared nav bar classes (content + SSR must be identical) ──
-const NAV_CLASSES =
-    "fixed bottom-0 left-0 right-0 z-50 bg-white/75 dark:bg-slate-950/80 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 pb-[env(safe-area-inset-bottom,20px)] pt-3 touch-none overscroll-none select-none";
-
-// ─── Resolve active path (handles trailing slash) ──────────
-function isPathActive(pathname: string, href: string): boolean {
-    const normalized = pathname.replace(/\/$/, "") || "/";
-    if (href === "/") return normalized === "/";
-    return normalized.startsWith(href);
+// ─── Active path check (handles trailing slash) ────────────
+function matchPath(pathname: string, href: string): boolean {
+    const p = pathname.replace(/\/$/, "") || "/";
+    if (href === "/") return p === "/";
+    return p === href || p.startsWith(href + "/");
 }
 
-// ─── Single nav item (memoized — only re-renders if props change) ──
-const NavItemLink = memo(function NavItemLink({
-    href,
-    label,
-    Icon,
-    isActive,
-    onTap,
-}: {
-    href: string;
-    label: string;
-    Icon: typeof LayoutDashboard;
-    isActive: boolean;
-    onTap: () => void;
-}) {
-    return (
-        <Link
-            href={href}
-            onClick={onTap}
-            aria-label={label}
-            aria-current={isActive ? "page" : undefined}
-            className="relative flex flex-col items-center justify-center gap-1 min-w-[64px] py-1 group touch-manipulation active:scale-95 transition-transform duration-150"
-        >
-            <div
-                className={`relative z-10 transition-colors duration-200 ${isActive
-                        ? "text-indigo-600 dark:text-white"
-                        : "text-slate-500 dark:text-slate-500"
-                    }`}
-            >
-                <Icon
-                    size={24}
-                    strokeWidth={isActive ? 2.4 : 1.8}
-                    className={
-                        isActive
-                            ? "fill-indigo-500/10 dark:fill-white/10"
-                            : "fill-transparent"
-                    }
-                />
-            </div>
-
-            <span
-                className={`text-[10px] font-medium leading-none transition-colors duration-200 ${isActive
-                        ? "text-indigo-600 dark:text-white"
-                        : "text-slate-500 dark:text-slate-500"
-                    }`}
-            >
-                {label}
-            </span>
-
-            <div
-                aria-hidden="true"
-                className={`w-4 h-0.5 rounded-full transition-all duration-200 ${isActive
-                        ? "bg-indigo-500 dark:bg-white opacity-100"
-                        : "bg-transparent opacity-0"
-                    }`}
-            />
-        </Link>
-    );
-});
-
-// ─── Main component (NO Suspense needed — no useSearchParams) ──
+// ─── Component ─────────────────────────────────────────────
 export function BottomNav() {
     const pathname = usePathname();
     const { t } = useTranslation();
-    const [mounted, setMounted] = useState(false);
-    const mountedRef = useRef(false);
 
-    useEffect(() => {
-        // Use ref to avoid double-render in StrictMode
-        if (!mountedRef.current) {
-            mountedRef.current = true;
-            setMounted(true);
-        }
-    }, []);
-
-    const handleTap = useCallback(() => {
+    const onTap = useCallback(() => {
         hapticLight();
     }, []);
 
     return (
-        <nav aria-label="Navigation principale" className={NAV_CLASSES}>
-            <div className="max-w-md mx-auto flex items-center justify-around px-4">
-                {NAV_ITEMS.map((item) => (
-                    <NavItemLink
-                        key={item.href}
-                        href={item.href}
-                        label={mounted ? t.nav[item.labelKey] : SSR_LABELS[item.labelKey]}
-                        Icon={item.icon}
-                        isActive={mounted ? isPathActive(pathname, item.href) : false}
-                        onTap={handleTap}
-                    />
-                ))}
+        <nav
+            aria-label="Navigation principale"
+            className={NAV_CLS}
+            suppressHydrationWarning
+        >
+            <div className="max-w-md mx-auto flex items-center justify-around px-2">
+                {NAV_ITEMS.map((item) => {
+                    const active = matchPath(pathname, item.href);
+                    const Icon = item.icon;
+                    const label = (t.nav as Record<string, string>)[item.labelKey] ?? item.labelKey;
+
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={onTap}
+                            aria-label={label}
+                            aria-current={active ? "page" : undefined}
+                            className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 active:scale-95 transition-transform duration-100"
+                            suppressHydrationWarning
+                        >
+                            <Icon
+                                size={22}
+                                strokeWidth={active ? 2.4 : 1.7}
+                                className={active
+                                    ? "text-indigo-600 dark:text-white fill-indigo-500/10 dark:fill-white/10"
+                                    : "text-slate-400 dark:text-slate-500 fill-transparent"
+                                }
+                            />
+                            <span
+                                className={`text-[10px] font-medium leading-tight ${active
+                                    ? "text-indigo-600 dark:text-white"
+                                    : "text-slate-400 dark:text-slate-500"
+                                    }`}
+                                suppressHydrationWarning
+                            >
+                                {label}
+                            </span>
+                            {active && (
+                                <div className="w-4 h-0.5 rounded-full bg-indigo-500 dark:bg-white mt-0.5" />
+                            )}
+                        </Link>
+                    );
+                })}
             </div>
         </nav>
     );
