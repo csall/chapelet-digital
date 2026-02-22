@@ -1,0 +1,20 @@
+{
+    "name": "Chapelet Digital",
+    "short_name": "Chapelet",
+    "description": "Chapelet digital — dhikr & invocations",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#05070c",
+    "theme_color": "#05070c",
+    "orientation": "portrait",
+    "lang": "fr",
+    "categories": ["lifestyle", "utilities"],
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "1024x1024",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
