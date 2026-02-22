@@ -182,10 +182,13 @@ ConnectionString.displayName = "ConnectionString";
 const ShootingStar = () => {
     const ref = useRef<THREE.Mesh>(null);
     const [active, setActive] = useState(false);
+    const prefersReducedMotion = useMemo(() =>
+        typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []);
 
     // Randomize start delay and position
     const reset = useCallback(() => {
-        if (!ref.current) return;
+        if (!ref.current || prefersReducedMotion) return;
         const x = (Math.random() - 0.5) * 100;
         const y = (Math.random() - 0.5) * 60 + 20; // High in the sky
         const z = -40 - Math.random() * 40;
@@ -194,11 +197,12 @@ const ShootingStar = () => {
 
         // Random timeout before next launch 5s to 15s
         setTimeout(() => setActive(true), Math.random() * 10000 + 5000);
-    }, []);
+    }, [prefersReducedMotion]);
 
     useEffect(() => {
+        if (prefersReducedMotion) return;
         reset();
-    }, [reset]);
+    }, [reset, prefersReducedMotion]);
 
     useFrame((state, delta) => {
         if (!active || !ref.current) return;
@@ -514,13 +518,26 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
         }
     }, [triggerTapAnimation]);
 
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (!isInteractiveRef.current) return;
+        if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            triggerTapAnimation();
+            onAdvanceRef.current();
+        }
+    }, [triggerTapAnimation]);
+
     if (presetId === "none") return <div className="h-full w-full bg-slate-950" />;
 
     return (
-        <div
-            className={`h-full w-full cursor-pointer touch-none select-none ${isUiOpen ? 'pointer-events-none' : ''}`}
+        <button
+            type="button"
+            tabIndex={isUiOpen ? -1 : 0}
+            aria-label={`Chapelet — appuyer pour avancer (${count} sur ${total})`}
+            className={`h-full w-full cursor-pointer touch-none select-none bg-transparent border-0 p-0 ${isUiOpen ? 'pointer-events-none' : ''}`}
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
+            onKeyDown={handleKeyDown}
         >
             <Canvas
                 key="main-bead-canvas"
@@ -559,7 +576,7 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
                 <StarryNightBackground />
                 <fog attach="fog" args={[isLight ? '#eeeef2' : '#05070c', isLight ? 6 : 4, isLight ? 30 : 25]} />
             </Canvas>
-        </div>
+        </button>
     );
 });
 

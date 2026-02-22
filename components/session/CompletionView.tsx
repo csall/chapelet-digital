@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { CircleCheck, RefreshCw, BookOpen, Sparkles } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useId } from "react";
 import confetti from "canvas-confetti";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import { hapticGravity, hapticLight } from "@/lib/utils/haptics";
@@ -18,9 +18,12 @@ interface CompletionViewProps {
 
 export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, isIntermediary, onNext }: CompletionViewProps) {
     const { t } = useTranslation();
+    const shouldReduceMotion = useReducedMotion();
+    const titleId = useId();
     const confettiLaunched = useRef(false);
 
     useEffect(() => {
+        if (shouldReduceMotion) return; // Ne pas lancer de confettis si réduction de mouvement activée
         if (!confettiLaunched.current) {
             const duration = isIntermediary ? 2.5 * 1000 : 5 * 1000;
             const animationEnd = Date.now() + duration;
@@ -82,6 +85,9 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
 
     return (
         <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             className="flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white relative pointer-events-auto w-full max-w-sm mx-auto z-[80] transition-all"
             onPointerDown={stopAllBubbles}
             onPointerUp={stopAllBubbles}
@@ -91,8 +97,8 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
             onTouchEnd={stopAllBubbles}
         >
             <div className="relative w-full overflow-hidden bg-slate-900/95 backdrop-blur-3xl border border-white/20 rounded-[2.5rem] p-8 sm:p-10 shadow-[0_0_50px_rgba(0,0,0,0.6)]">
-                {/* Celestial Background Elements */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Celestial Background Elements — décoratifs, cachés de VoiceOver */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
                     <motion.div
                         animate={{
                             scale: [1, 1.2, 1],
@@ -115,8 +121,8 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                     />
                 </div>
 
-                {/* Success Icon Group */}
-                <div className="relative mb-8 flex justify-center">
+                {/* Success Icon Group — décoratif */}
+                <div className="relative mb-8 flex justify-center" aria-hidden="true">
                     <motion.div
                         initial={{ scale: 0, rotate: -45 }}
                         animate={{ scale: 1, rotate: 0 }}
@@ -219,6 +225,7 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                             damping: 15,
                             delay: 0.4
                         }}
+                        id={titleId}
                         className="text-4xl font-black text-white tracking-tight"
                     >
                         {isIntermediary ? t.session.completion.success : t.session.completion.congratulations}

@@ -205,10 +205,25 @@ input[type="search"]::-webkit-search-results-decoration {
   }
 }
 
+/* ── Reduced Motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer base {
   html {
     overscroll-behavior-y: none;
     -webkit-tap-highlight-color: transparent;
+    /* Allow Dynamic Type / Larger Text to scale content */
+    -webkit-text-size-adjust: auto;
+    text-size-adjust: auto;
   }
 
   body {

@@ -95,12 +95,14 @@ const SessionHeader = memo(({
             className="w-full pt-[calc(env(safe-area-inset-top,20px)+12px)] pb-2 px-6 flex flex-col items-center gap-4 relative"
           >
             {/* Top Control Bar */}
-            <div className="w-full flex items-center justify-center gap-8 pointer-events-auto">
+            <div className="w-full flex items-center justify-center gap-8 pointer-events-auto" role="group" aria-label="Contrôles de session">
               <button
                 onClick={toggleSound}
+                aria-label={soundEnabled ? "Désactiver le son" : "Activer le son"}
+                aria-pressed={soundEnabled}
                 className={`w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-xl transition-all active:scale-95 ${soundEnabled ? 'bg-white/10 text-white border border-white/10' : 'bg-white/5 text-white/30 border border-white/5'}`}
               >
-                {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                {soundEnabled ? <Volume2 size={18} aria-hidden="true" /> : <VolumeX size={18} aria-hidden="true" />}
               </button>
 
               <motion.button
@@ -109,16 +111,19 @@ const SessionHeader = memo(({
                   hapticMedium();
                   reset();
                 }}
+                aria-label="Réinitialiser la session"
                 className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 border border-white/20 text-white/80 transition-all backdrop-blur-xl active:bg-white/20"
               >
-                <RotateCcw size={18} />
+                <RotateCcw size={18} aria-hidden="true" />
               </motion.button>
 
               <button
                 onClick={toggleHaptics}
+                aria-label={hapticsEnabled ? "Désactiver les vibrations" : "Activer les vibrations"}
+                aria-pressed={hapticsEnabled}
                 className={`w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-xl transition-all active:scale-95 ${hapticsEnabled ? 'bg-white/10 text-white border border-white/10' : 'bg-white/5 text-white/30 border border-white/5'}`}
               >
-                {hapticsEnabled ? <Vibrate size={18} /> : <VibrateOff size={18} />}
+                {hapticsEnabled ? <Vibrate size={18} aria-hidden="true" /> : <VibrateOff size={18} aria-hidden="true" />}
               </button>
             </div>
 
@@ -282,7 +287,12 @@ const SessionHeader = memo(({
                     exit={{ opacity: 0, scale: 1.2 }}
                     className="relative flex flex-col items-center"
                   >
-                    <span className="text-4xl font-black tabular-nums tracking-tighter text-white">
+                    <span
+                      className="text-4xl font-black tabular-nums tracking-tighter text-white"
+                      aria-live="polite"
+                      aria-atomic="true"
+                      aria-label={`${progress.cycleProgress} sur ${progress.cycleTotal}`}
+                    >
                       {progress.cycleProgress}
                     </span>
                   </motion.div>

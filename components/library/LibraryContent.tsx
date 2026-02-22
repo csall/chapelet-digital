@@ -133,12 +133,13 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                         {onClose ? (
                                             <button
                                                 onClick={onClose}
+                                                aria-label="Fermer la bibliothèque"
                                                 className="w-full h-full flex items-center justify-center text-white/50 hover:text-white transition-colors"
                                             >
-                                                <X size={18} />
+                                                <X size={18} aria-hidden="true" />
                                             </button>
                                         ) : (
-                                            <Sparkles size={16} style={{ color: beadColor }} />
+                                            <Sparkles size={16} style={{ color: beadColor }} aria-hidden="true" />
                                         )}
                                     </div>
                                     <div>
@@ -149,9 +150,10 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                 <div className="flex items-center gap-1">
                                     <button
                                         onClick={() => setIsSearching(true)}
+                                        aria-label="Rechercher"
                                         className="p-2.5 rounded-full hover:bg-white/5 text-white/50 active:scale-90 transition-all"
                                     >
-                                        <Search size={22} />
+                                        <Search size={22} aria-hidden="true" />
                                     </button>
 
                                     {/* + button Spotify-style */}
@@ -159,11 +161,14 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                         <motion.button
                                             whileTap={{ scale: 0.88 }}
                                             onClick={() => setIsAddMenuOpen(v => !v)}
+                                            aria-label="Ajouter une collection ou une invocation"
+                                            aria-expanded={isAddMenuOpen}
                                             className="p-2.5 rounded-full hover:bg-white/5 text-white/50 active:scale-90 transition-all"
                                         >
                                             <motion.div
                                                 animate={{ rotate: isAddMenuOpen ? 45 : 0 }}
                                                 transition={{ duration: 0.2, ease: "easeInOut" }}
+                                                aria-hidden="true"
                                             >
                                                 <Plus size={22} strokeWidth={2.5} />
                                             </motion.div>
@@ -280,16 +285,18 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                 </AnimatePresence>
 
                 {/* ── TABS ─────────────────────────── */}
-                <div className="flex gap-2">
+                <div role="tablist" aria-label="Catégories" className="flex gap-2">
                     {[
-                        { key: "collections" as const, label: t.library.collections, icon: <Sparkles size={13} />, count: groups.length },
-                        { key: "invocations" as const, label: t.library.invocations, icon: <BookOpen size={13} />, count: invocations.length },
-                        { key: "favorites" as const, label: t.library.favorites, icon: <Star size={13} />, count: favoriteInvocations.length + favoriteGroups.length },
+                        { key: "collections" as const, label: t.library.collections, icon: <Sparkles size={13} aria-hidden="true" />, count: groups.length },
+                        { key: "invocations" as const, label: t.library.invocations, icon: <BookOpen size={13} aria-hidden="true" />, count: invocations.length },
+                        { key: "favorites" as const, label: t.library.favorites, icon: <Star size={13} aria-hidden="true" />, count: favoriteInvocations.length + favoriteGroups.length },
                     ].map(tab => {
                         const isActive = activeTab === tab.key;
                         return (
                             <motion.button
                                 key={tab.key}
+                                role="tab"
+                                aria-selected={isActive}
                                 onClick={() => setActiveTab(tab.key)}
                                 whileTap={{ scale: 0.95 }}
                                 className="relative flex-1 flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl border transition-all duration-300"

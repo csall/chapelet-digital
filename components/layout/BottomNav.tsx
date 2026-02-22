@@ -32,7 +32,7 @@ function BottomNavContent() {
     };
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/75 dark:bg-slate-950/80 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 pb-[env(safe-area-inset-bottom,20px)] pt-3 touch-none overscroll-none select-none">
+        <nav aria-label="Navigation principale" className="fixed bottom-0 left-0 right-0 z-50 bg-white/75 dark:bg-slate-950/80 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 pb-[env(safe-area-inset-bottom,20px)] pt-3 touch-none overscroll-none select-none">
             <div className="max-w-md mx-auto flex items-center justify-around px-4">
                 {items.map((item) => {
                     const Icon = item.icon;
@@ -54,6 +54,8 @@ function BottomNavContent() {
                             key={item.href}
                             href={item.href}
                             onClick={handleHaptic}
+                            aria-label={item.label}
+                            aria-current={isActive ? "page" : undefined}
                             className="relative flex flex-col items-center justify-center gap-1 min-w-[64px] py-1 group touch-manipulation"
                         >
                             {/* Icon avec transition de couleur */}
