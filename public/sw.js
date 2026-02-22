@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────
-   Kourous — Service Worker
+   Chapelet-digital — Service Worker
    Stratégie : Cache-First pour les assets statiques,
                Network-First pour les pages HTML.
    L'app n'a aucune API externe : tout fonctionne hors-ligne.

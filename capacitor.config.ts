@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'fr.chapeletdigital.app',
+  appId: 'com.cheikh.chapeletdigital',
   appName: 'Chapelet Digital',
   webDir: 'out',
   server: {
