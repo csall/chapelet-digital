@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, HelpCircle, Mail, Smartphone, Volume2, Sparkles, BookOpen, Palette } from "lucide-react";
+import { ArrowLeft, HelpCircle, Mail, Smartphone, Volume2, Sparkles, BookOpen, Palette, Send } from "lucide-react";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 
 export default function SupportPage() {
@@ -50,9 +50,10 @@ export default function SupportPage() {
                                 </p>
                                 <a
                                     href="mailto:cheikh.sall@icloud.com"
-                                    className="inline-flex items-center justify-center w-full px-6 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm transition-colors shadow-lg shadow-cyan-500/20"
+                                    className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm transition-colors shadow-lg shadow-cyan-500/20"
                                 >
-                                    cheikh.sall@icloud.com
+                                    <Send size={16} />
+                                    <span>{t.settings.contact}</span>
                                 </a>
                             </div>
                         </section>
