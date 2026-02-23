@@ -23,41 +23,15 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
     const confettiLaunched = useRef(false);
 
     useEffect(() => {
-        if (shouldReduceMotion) return; // Ne pas lancer de confettis si réduction de mouvement activée
-        if (!confettiLaunched.current) {
-            const duration = isIntermediary ? 2 * 1000 : 4 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        if (shouldReduceMotion || confettiLaunched.current) return;
+        confettiLaunched.current = true;
 
-            const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-            const interval = setInterval(() => {
-                const timeLeft = animationEnd - Date.now();
-
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    return;
-                }
-
-                const particleCount = 20 * (timeLeft / duration);
-                // since particles fall down, start a bit higher than random
-                confetti({
-                    ...defaults,
-                    particleCount,
-                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                    colors: [beadColor, '#ffffff']
-                });
-                confetti({
-                    ...defaults,
-                    particleCount,
-                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                    colors: [beadColor, '#ffffff']
-                });
-            }, 400);
-
-            confettiLaunched.current = true;
-            return () => clearInterval(interval);
-        }
+        // Une seule salve (pas de setInterval) : zéro frame loop
+        const particleCount = isIntermediary ? 40 : 70;
+        const defaults = { startVelocity: 28, spread: 320, ticks: 50, zIndex: 0, colors: [beadColor, '#ffffff'] };
+        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: 0.1 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: 0.1 } });
     }, [beadColor, isIntermediary, shouldReduceMotion]);
 
     useEffect(() => {
@@ -101,15 +75,15 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
             onTouchStart={stopAllBubbles}
             onTouchEnd={stopAllBubbles}
         >
-            <div className="relative w-full overflow-hidden bg-slate-900/95 backdrop-blur-3xl border border-white/20 rounded-[2.5rem] p-8 sm:p-10 shadow-[0_0_50px_rgba(0,0,0,0.6)]">
-                {/* Celestial Background Elements — statiques, pas d'animation infinie */}
+            <div className="relative w-full overflow-hidden bg-slate-900/95 backdrop-blur-md border border-white/20 rounded-[2.5rem] p-8 sm:p-10 shadow-[0_0_50px_rgba(0,0,0,0.6)]">
+                {/* Ambient glow — taille et blur réduits pour limiter le compositing */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
                     <div
-                        className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full blur-[40px] opacity-[0.15]"
+                        className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full blur-[24px] opacity-[0.12]"
                         style={{ backgroundColor: beadColor }}
                     />
                     <div
-                        className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full blur-[60px] opacity-[0.10]"
+                        className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full blur-[24px] opacity-[0.08]"
                         style={{ backgroundColor: beadColor }}
                     />
                 </div>
@@ -191,11 +165,7 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                         transition={{ delay: 0.5 }}
                         className="text-white/60 text-sm font-medium px-4 leading-relaxed mt-2"
                     >
-                        {isIntermediary ? (
-                            <>{t.session.completion.sessionComplete} <span className="text-white font-bold">{presetName}</span>.</>
-                        ) : (
-                            <>{t.session.completion.sessionComplete} <span className="text-white font-bold">{presetName}</span>.</>
-                        )}
+                        {t.session.completion.sessionComplete} <span className="text-white font-bold">{presetName}</span>.
                     </motion.p>
                 </div>
 
@@ -228,7 +198,7 @@ export function CompletionView({ onReset, onOpenLibrary, presetName, beadColor, 
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.8 }}
                                 onClick={(e) => { stopAllBubbles(e); onOpenLibrary(); }}
-                                className="group flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-6 py-3.5 text-white hover:bg-white/10 active:scale-[0.98] transition-all duration-300 backdrop-blur-xl"
+                                className="group flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-6 py-3.5 text-white hover:bg-white/10 active:scale-[0.98] transition-all duration-300"
                             >
                                 <BookOpen size={14} style={{ color: beadColor }} />
                                 <span className="font-black text-[10px] uppercase tracking-wider">{t.library.title}</span>

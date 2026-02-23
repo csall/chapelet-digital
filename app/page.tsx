@@ -31,10 +31,26 @@ function getGreeting() {
 /* ─── Helpers ───────────────────────────────────────── */
 function darkenHex(hex: string, f = 0.38): string {
   if (!hex.startsWith("#") || hex.length < 7) return "#0a0f20";
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
+  const r = Number.parseInt(hex.slice(1, 3), 16);
+  const g = Number.parseInt(hex.slice(3, 5), 16);
+  const b = Number.parseInt(hex.slice(5, 7), 16);
   return `rgb(${Math.round(r * f)},${Math.round(g * f)},${Math.round(b * f)})`;
+}
+
+/**
+ * Teardrop curve — bout (pendant) en HAUT, boucle de perles en bas.
+ * t=0 / t=1 → sommet (jonction avec l'imame)
+ * t=0.5     → bas de la boucle (point le plus bas)
+ * Forme naturelle : plus étroit en haut, plus large et arrondi en bas.
+ */
+function teardropPt(t: number, cx: number, junctionY: number, rW: number, rH: number) {
+  const a = t * Math.PI * 2;
+  const rx = rW * (1 + 0.3 * Math.sin(a / 2));
+  const ry = rH * (0.8 + 0.4 * Math.sin(a / 2));
+  return {
+    x: cx + Math.sin(a) * rx,
+    y: junctionY + (1 - Math.cos(a)) * ry,
+  };
 }
 
 /* ─── Static Chapelet SVG ───────────────────────────── */
@@ -47,15 +63,25 @@ function StaticChapelet({
   readonly count?: number;
   readonly color?: string;
 }) {
-  const W = 300, H = 310;
-  const cx = 150, cy = 136;
-  const rx = 114, ry = 100;
+  // Canvas
+  const W = 280, H = 318;
+  const cx = 140;
+
+  // Imame (pendant) en haut
+  const lr = 12;             // rayon imame
+  const imaY = 62;           // centre imame
+  const junctionY = imaY + lr + 2; // jonction corde = bas imame
+
+  // Forme teardrop
+  const rW = 84, rH = 86;
 
   const colorDark = useMemo(() => darkenHex(color), [color]);
 
+  // Positions des perles le long de la courbe
   const beads = useMemo(() => {
     return Array.from({ length: total }, (_, i) => {
-      const angle = (i / total) * Math.PI * 2 - Math.PI / 2;
+      const t = (i + 0.5) / total; // décalage pour éviter la jonction exacte
+      const pt = teardropPt(t, cx, junctionY, rW, rH);
       const isMarker =
         total === 33
           ? i === 10 || i === 21
@@ -63,144 +89,161 @@ function StaticChapelet({
               i === Math.floor(total / 3) - 1 ||
               i === Math.floor((2 * total) / 3) - 1
             );
-      return {
-        x: cx + rx * Math.cos(angle),
-        y: cy + ry * Math.sin(angle),
-        isMarker,
-        done: i < count,
-        key: `${i}`,
-      };
+      return { ...pt, isMarker, done: i < count, key: `${i}` };
     });
-  }, [total, count]);
+  }, [total, count, junctionY]);
 
-  const stemY = cy + ry;
-  const leaderY = stemY + 26;
-  const lr = 12; // leader bead radius
+  // Polyline de la corde (boucle teardrop)
+  const cordPoints = useMemo(() => {
+    return Array.from({ length: 101 }, (_, i) => {
+      const pt = teardropPt(i / 100, cx, junctionY, rW, rH);
+      return `${pt.x.toFixed(1)},${pt.y.toFixed(1)}`;
+    }).join(" ");
+  }, [junctionY]);
+
+  // Centre du glow ambiant (milieu de la boucle)
+  const glowCY = junctionY + rH;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" aria-hidden="true">
       <defs>
-        {/* Active/done bead — lit from top-left */}
         <radialGradient id="sc-done" cx="36%" cy="27%" r="70%">
           <stop offset="0%" stopColor="white" stopOpacity="0.65" />
           <stop offset="22%" stopColor={color} />
           <stop offset="100%" stopColor={colorDark} />
         </radialGradient>
-
-        {/* Inactive bead */}
         <radialGradient id="sc-idle" cx="36%" cy="27%" r="70%">
           <stop offset="0%" stopColor="white" stopOpacity="0.18" />
           <stop offset="38%" stopColor="#18243e" />
           <stop offset="100%" stopColor="#060c18" />
         </radialGradient>
-
-        {/* Marker bead — silver */}
         <radialGradient id="sc-mark" cx="36%" cy="27%" r="70%">
           <stop offset="0%" stopColor="white" stopOpacity="0.75" />
           <stop offset="28%" stopColor="#7b8fae" />
           <stop offset="100%" stopColor="#1a2236" />
         </radialGradient>
-
-        {/* Leader/tête bead */}
         <radialGradient id="sc-lead" cx="36%" cy="27%" r="70%">
-          <stop offset="0%" stopColor="white" stopOpacity="0.45" />
-          <stop offset="30%" stopColor="#2c3d60" />
+          <stop offset="0%" stopColor="white" stopOpacity="0.5" />
+          <stop offset="28%" stopColor="#2c3d62" />
           <stop offset="100%" stopColor="#080e1e" />
         </radialGradient>
-
-        {/* Soft drop-shadow filter */}
-        <filter id="sc-shadow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="black" floodOpacity="0.5" />
+        <filter id="sc-shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="black" floodOpacity="0.55" />
         </filter>
       </defs>
 
-      {/* ── Ambient glow when there's progress ── */}
+      {/* ── Glow ambiant (quand il y a de la progression) ── */}
       {count > 0 && (
         <ellipse
-          cx={cx} cy={cy} rx={rx + 20} ry={ry + 20}
-          fill="none" stroke={color} strokeWidth="32" opacity="0.05"
+          cx={cx} cy={glowCY}
+          rx={rW + 18} ry={rH + 12}
+          fill="none" stroke={color} strokeWidth="34" opacity="0.05"
         />
       )}
 
-      {/* ── Cord ── */}
-      <ellipse
-        cx={cx} cy={cy} rx={rx} ry={ry}
+      {/* ── Cordon (boucle teardrop) ── */}
+      <polyline
+        points={cordPoints}
         fill="none"
-        stroke="rgba(180,160,120,0.18)"
-        strokeWidth="2"
+        stroke="rgba(190,165,115,0.2)"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
       />
 
-      {/* ── Pendant stem ── */}
+      {/* ── Cordon : tige entre imame et jonction ── */}
       <line
-        x1={cx} y1={stemY}
-        x2={cx} y2={leaderY - lr}
-        stroke="rgba(180,160,120,0.18)"
-        strokeWidth="2"
+        x1={cx} y1={imaY + lr}
+        x2={cx} y2={junctionY}
+        stroke="rgba(190,165,115,0.2)"
+        strokeWidth="1.8"
       />
 
-      {/* ── Leader bead ── */}
-      <ellipse cx={cx + 2} cy={leaderY + 4} rx={lr} ry={lr * 0.5} fill="black" opacity="0.35" />
-      <circle cx={cx} cy={leaderY} r={lr} fill="url(#sc-lead)" filter="url(#sc-shadow)" />
-      {/* Main specular */}
-      <circle cx={cx - lr * 0.32} cy={leaderY - lr * 0.35} r={lr * 0.28} fill="white" opacity="0.45" />
-      {/* Micro sparkle */}
-      <circle cx={cx - lr * 0.58} cy={leaderY - lr * 0.55} r={lr * 0.1} fill="white" opacity="0.7" />
+      {/* ── Cordon : tige au-dessus de l'imame ── */}
+      <line
+        x1={cx} y1={imaY - lr}
+        x2={cx} y2={imaY - lr - 10}
+        stroke="rgba(190,165,115,0.2)"
+        strokeWidth="1.8"
+      />
 
-      {/* ── Tassel ── */}
-      {([[-9, 18], [-3, 21], [3, 20], [9, 17]] as const).map(([dx, dy]) => (
+      {/* ── Anneau de retenue ── */}
+      <circle
+        cx={cx} cy={imaY - lr - 14}
+        r={5}
+        fill="none"
+        stroke="rgba(210,185,130,0.35)"
+        strokeWidth="1.8"
+      />
+
+      {/* ── Touffe (vers le haut, au-dessus de l'anneau) ── */}
+      {([[-9, -18], [-3, -21], [3, -20], [9, -17]] as const).map(([dx, dy]) => (
         <line
           key={dx}
-          x1={cx + dx * 0.4} y1={leaderY + lr}
-          x2={cx + dx} y2={leaderY + lr + dy}
-          stroke="rgba(200,180,140,0.2)"
-          strokeWidth="1.5"
+          x1={cx + dx * 0.3} y1={imaY - lr - 14}
+          x2={cx + dx} y2={imaY - lr - 14 + dy}
+          stroke="rgba(210,185,130,0.28)"
+          strokeWidth="1.6"
           strokeLinecap="round"
         />
       ))}
 
-      {/* ── Beads ── */}
+      {/* ── Imame (perle principale, en haut) ── */}
+      <ellipse
+        cx={cx + 2} cy={imaY + lr * 0.5 + 2}
+        rx={lr} ry={lr * 0.5}
+        fill="black" opacity="0.32"
+      />
+      <circle cx={cx} cy={imaY} r={lr} fill="url(#sc-lead)" filter="url(#sc-shadow)" />
+      <circle cx={cx - lr * 0.32} cy={imaY - lr * 0.36} r={lr * 0.28} fill="white" opacity="0.48" />
+      <circle cx={cx - lr * 0.58} cy={imaY - lr * 0.55} r={lr * 0.1} fill="white" opacity="0.72" />
+
+      {/* ── Perles ── */}
       {beads.map((b) => {
         const r = b.isMarker ? 9.5 : 7;
-        const gradId = b.isMarker ? "sc-mark" : b.done ? "sc-done" : "sc-idle";
-        const glowOpacity = b.done && !b.isMarker ? 0.2 : 0;
+        let gradId: string;
+        if (b.isMarker) gradId = "sc-mark";
+        else if (b.done) gradId = "sc-done";
+        else gradId = "sc-idle";
+
+        let specularOpacity: number;
+        if (b.done) specularOpacity = 0.52;
+        else if (b.isMarker) specularOpacity = 0.58;
+        else specularOpacity = 0.2;
+
+        let sparkOpacity: number;
+        if (b.done) sparkOpacity = 0.88;
+        else if (b.isMarker) sparkOpacity = 0.82;
+        else sparkOpacity = 0.32;
 
         return (
           <g key={b.key}>
-            {/* Done glow halo */}
-            {glowOpacity > 0 && (
-              <circle cx={b.x} cy={b.y} r={r + 5} fill={color} opacity={glowOpacity} />
+            {/* Halo de progression */}
+            {b.done && !b.isMarker && (
+              <circle cx={b.x} cy={b.y} r={r + 5} fill={color} opacity={0.18} />
             )}
-
-            {/* Drop shadow */}
+            {/* Ombre portée */}
             <ellipse
               cx={b.x + 1.5} cy={b.y + 2.5}
               rx={r} ry={r * 0.5}
-              fill="black" opacity={b.done ? 0.45 : 0.28}
+              fill="black" opacity={b.done ? 0.45 : 0.25}
             />
-
-            {/* Bead body */}
+            {/* Corps de la perle */}
             <circle
               cx={b.x} cy={b.y} r={r}
               fill={`url(#${gradId})`}
-              opacity={b.done || b.isMarker ? 1 : 0.82}
+              opacity={b.done || b.isMarker ? 1 : 0.8}
             />
-
-            {/* Main specular */}
+            {/* Reflet principal */}
             <circle
-              cx={b.x - r * 0.3}
-              cy={b.y - r * 0.35}
-              r={r * 0.28}
+              cx={b.x - r * 0.3} cy={b.y - r * 0.35} r={r * 0.28}
               fill="white"
-              opacity={b.done ? 0.5 : b.isMarker ? 0.55 : 0.22}
+              opacity={specularOpacity}
             />
-
-            {/* Micro sparkle */}
+            {/* Micro-éclat */}
             <circle
-              cx={b.x - r * 0.56}
-              cy={b.y - r * 0.54}
-              r={r * 0.1}
+              cx={b.x - r * 0.56} cy={b.y - r * 0.54} r={r * 0.1}
               fill="white"
-              opacity={b.done ? 0.85 : b.isMarker ? 0.8 : 0.35}
+              opacity={sparkOpacity}
             />
           </g>
         );

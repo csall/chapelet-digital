@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   },
   // Enable compiler optimizations  
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
 
   // Experimental features for better performance
@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
   turbopack: {},
 
   // Build optimization
+  productionBrowserSourceMaps: false,
   poweredByHeader: false,
 
   // Static generation optimization
