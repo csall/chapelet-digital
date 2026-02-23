@@ -22,7 +22,7 @@ interface LibraryContentProps {
 
 export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [activeTab, setActiveTab] = useState<"collections" | "invocations" | "favorites">("collections");
+    const [activeTab, setActiveTab] = useState<"collections" | "invocations" | "favorites">("invocations");
     const [isCreateInvocationModalOpen, setIsCreateInvocationModalOpen] = useState(false);
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
     const [editingGroup, setEditingGroup] = useState<InvocationGroup | null>(null);
@@ -284,8 +284,8 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                 {/* ── TABS ─────────────────────────── */}
                 <div role="tablist" aria-label="Catégories" className="flex gap-2">
                     {[
-                        { key: "collections" as const, label: t.library.collections, icon: <Sparkles size={13} aria-hidden="true" />, count: groups.length },
                         { key: "invocations" as const, label: t.library.invocations, icon: <BookOpen size={13} aria-hidden="true" />, count: invocations.length },
+                        { key: "collections" as const, label: t.library.collections, icon: <Sparkles size={13} aria-hidden="true" />, count: groups.length },
                         { key: "favorites" as const, label: t.library.favorites, icon: <Star size={13} aria-hidden="true" />, count: favoriteInvocations.length + favoriteGroups.length },
                     ].map(tab => {
                         const isActive = activeTab === tab.key;
@@ -383,6 +383,22 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                         >
                             {favoriteIds.length > 0 ? (
                                 <div className="space-y-8">
+                                    {favoriteInvocations.length > 0 && (
+                                        <div className="space-y-4">
+                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/25 px-1">{t.library.invocations}</h3>
+                                            <FavoriteSection
+                                                invocations={favoriteInvocations}
+                                                onSessionStart={onSessionStart}
+                                                onDelete={deleteInvocation}
+                                                onEdit={handleEditInvocation}
+                                                onToggleFavorite={toggleFavorite}
+                                                isFavorite={isFavorite}
+                                                beadColor={beadColor}
+                                                expandedId={expandedId}
+                                                onToggleExpand={toggleExpand}
+                                            />
+                                        </div>
+                                    )}
                                     {favoriteGroups.length > 0 && (
                                         <div className="space-y-4">
                                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/25 px-1">{t.library.collections}</h3>
@@ -397,22 +413,6 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                                 isFavorite={isFavorite}
                                                 beadColor={beadColor}
                                                 getInvocationById={getInvocationById}
-                                            />
-                                        </div>
-                                    )}
-                                    {favoriteInvocations.length > 0 && (
-                                        <div className="space-y-4">
-                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/25 px-1">{t.library.invocations}</h3>
-                                            <FavoriteSection
-                                                invocations={favoriteInvocations}
-                                                onSessionStart={onSessionStart}
-                                                onDelete={deleteInvocation}
-                                                onEdit={handleEditInvocation}
-                                                onToggleFavorite={toggleFavorite}
-                                                isFavorite={isFavorite}
-                                                beadColor={beadColor}
-                                                expandedId={expandedId}
-                                                onToggleExpand={toggleExpand}
                                             />
                                         </div>
                                     )}

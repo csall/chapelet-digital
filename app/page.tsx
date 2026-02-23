@@ -335,11 +335,26 @@ export default function HomePage() {
           </fieldset>
         </motion.div>
 
+        {/* ── QUOTE ───────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15, duration: 0.8 }}
+          className="shrink-0 text-center px-3 -mt-1"
+        >
+          <p className="text-[14px] leading-[1.8] text-white/75 font-light italic px-2">
+            &ldquo;{resolve(dailyQuote.text)}&rdquo;
+          </p>
+          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">
+            {resolve(dailyQuote.source)}
+          </p>
+        </motion.div>
+
         {/* ── CHAPELET HERO ───────────────────────── */}
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="flex-1 min-h-0 flex items-center justify-center"
         >
           <div className="w-full max-w-[300px] aspect-square">
@@ -349,21 +364,6 @@ export default function HomePage() {
               color={beadColor}
             />
           </div>
-        </motion.div>
-
-        {/* ── QUOTE ───────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="shrink-0 text-center px-3 -mt-1"
-        >
-          <p className="text-[14px] leading-[1.8] text-white/75 font-light italic px-2">
-            &ldquo;{resolve(dailyQuote.text)}&rdquo;
-          </p>
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">
-            {resolve(dailyQuote.source)}
-          </p>
         </motion.div>
 
         {/* ── PROGRESSION / START ─────────────────── */}
