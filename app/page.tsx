@@ -72,8 +72,8 @@ function StaticChapelet({
   const imaY = 62;           // centre imame
   const junctionY = imaY + lr + 2; // jonction corde = bas imame
 
-  // Forme teardrop
-  const rW = 84, rH = 86;
+  // Forme teardrop — ovale (plus haut que large)
+  const rW = 62, rH = 96;
 
   const colorDark = useMemo(() => darkenHex(color), [color]);
 
@@ -145,7 +145,7 @@ function StaticChapelet({
       <polyline
         points={cordPoints}
         fill="none"
-        stroke="rgba(190,165,115,0.2)"
+        stroke={color} strokeOpacity="0.35"
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
@@ -154,7 +154,7 @@ function StaticChapelet({
       <line
         x1={cx} y1={imaY + lr}
         x2={cx} y2={junctionY}
-        stroke="rgba(190,165,115,0.2)"
+        stroke={color} strokeOpacity="0.6"
         strokeWidth="1.8"
       />
 
@@ -162,7 +162,7 @@ function StaticChapelet({
       <line
         x1={cx} y1={imaY - lr}
         x2={cx} y2={imaY - lr - 10}
-        stroke="rgba(190,165,115,0.2)"
+        stroke={color} strokeOpacity="0.6"
         strokeWidth="1.8"
       />
 
@@ -171,7 +171,7 @@ function StaticChapelet({
         cx={cx} cy={imaY - lr - 14}
         r={5}
         fill="none"
-        stroke="rgba(210,185,130,0.35)"
+        stroke={color} strokeOpacity="0.55"
         strokeWidth="1.8"
       />
 
@@ -181,7 +181,7 @@ function StaticChapelet({
           key={dx}
           x1={cx + dx * 0.3} y1={imaY - lr - 14}
           x2={cx + dx} y2={imaY - lr - 14 + dy}
-          stroke="rgba(210,185,130,0.28)"
+          stroke={color} strokeOpacity="0.4"
           strokeWidth="1.6"
           strokeLinecap="round"
         />
@@ -193,7 +193,7 @@ function StaticChapelet({
         rx={lr} ry={lr * 0.5}
         fill="black" opacity="0.32"
       />
-      <circle cx={cx} cy={imaY} r={lr} fill="url(#sc-lead)" filter="url(#sc-shadow)" />
+      <circle cx={cx} cy={imaY} r={lr} fill="url(#sc-done)" filter="url(#sc-shadow)" />
       <circle cx={cx - lr * 0.32} cy={imaY - lr * 0.36} r={lr * 0.28} fill="white" opacity="0.48" />
       <circle cx={cx - lr * 0.58} cy={imaY - lr * 0.55} r={lr * 0.1} fill="white" opacity="0.72" />
 
@@ -275,9 +275,6 @@ export default function HomePage() {
     ? (totalCount / preset.totalBeads)
     : 0;
 
-  const chapeletTotal = preset?.totalBeads ?? 33;
-  const chapeletCount = hasActiveSession ? totalCount : 0;
-
   const handleStartFreeSession = () => {
     setFreeSession();
     router.push("/session");
@@ -347,8 +344,8 @@ export default function HomePage() {
         >
           <div className="w-full max-w-[300px] aspect-square">
             <StaticChapelet
-              total={chapeletTotal}
-              count={chapeletCount}
+              total={20}
+              count={Math.round(progress * 20)}
               color={beadColor}
             />
           </div>
@@ -359,12 +356,12 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="shrink-0 text-center px-3"
+          className="shrink-0 text-center px-3 -mt-1"
         >
-          <p className="text-[13px] leading-[1.65] text-white/50 font-light italic">
+          <p className="text-[14px] leading-[1.8] text-white/75 font-light italic px-2">
             &ldquo;{resolve(dailyQuote.text)}&rdquo;
           </p>
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 mt-2">
+          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">
             {resolve(dailyQuote.source)}
           </p>
         </motion.div>
@@ -376,50 +373,47 @@ export default function HomePage() {
           transition={{ delay: 0.5, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="shrink-0 rounded-[22px] overflow-hidden"
           style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.07)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
+            background: hasActiveSession ? `${beadColor}12` : "rgba(255,255,255,0.04)",
+            border: hasActiveSession ? `1px solid ${beadColor}35` : "1px solid rgba(255,255,255,0.09)",
           }}
         >
           {hasActiveSession ? (
             <button
               onClick={() => router.push("/session")}
-              className="w-full flex items-center gap-4 p-4 active:opacity-80 transition-opacity"
+              className="w-full flex items-center gap-4 p-4 active:opacity-70 transition-opacity"
             >
               {/* Arc progress */}
-              <div className="relative w-14 h-14 shrink-0">
+              <div className="relative w-16 h-16 shrink-0">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 56 56">
-                  <circle cx="28" cy="28" r="23" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+                  <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
                   <circle
-                    cx="28" cy="28" r="23" fill="none"
+                    cx="28" cy="28" r="22" fill="none"
                     stroke={beadColor}
-                    strokeWidth="3" strokeLinecap="round"
-                    strokeDasharray={`${progress * 144.5} 144.5`}
-                    opacity="0.8"
+                    strokeWidth="4" strokeLinecap="round"
+                    strokeDasharray={`${progress * 138.2} 138.2`}
                   />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-[11px] font-black text-white tabular-nums">
+                <span className="absolute inset-0 flex items-center justify-center text-[12px] font-black text-white tabular-nums">
                   {Math.round(progress * 100)}%
                 </span>
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-1">
+                <p className="text-[8px] font-black uppercase tracking-[0.4em] mb-1" style={{ color: beadColor, opacity: 0.8 }}>
                   {t.home.progression}
                 </p>
-                <p className="text-sm text-white/70 truncate font-medium">
+                <p className="text-sm text-white/90 truncate font-semibold">
                   {resolve(preset?.name)}
                 </p>
-                <p className="text-[9px] text-white/30 mt-0.5">
+                <p className="text-[10px] text-white/45 mt-0.5 tabular-nums">
                   {totalCount} / {preset?.totalBeads}
                 </p>
               </div>
-              <div className="text-white/20 text-lg pr-1">›</div>
+              <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: `${beadColor}25`, color: beadColor }}>›</div>
             </button>
           ) : (
             <button
               onClick={() => router.push("/library")}
-              className="w-full py-4 text-[10px] font-black uppercase tracking-[0.35em] text-center active:opacity-80 transition-opacity"
+              className="w-full py-4 text-[10px] font-black uppercase tracking-[0.35em] text-center active:opacity-70 transition-opacity"
               style={{ color: "#a5b4fc" }}
             >
               ▶&nbsp;&nbsp;{t.home.explorer}
@@ -438,8 +432,8 @@ export default function HomePage() {
             onClick={() => router.push("/library")}
             className="flex flex-col items-center gap-2 py-4 glass-premium rounded-[20px] active:scale-[0.96] transition-transform"
           >
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center">
-              <Library size={16} className="text-indigo-400" />
+            <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{ background: `${beadColor}10`, borderColor: `${beadColor}33` }}>
+              <Library size={16} style={{ color: beadColor }} />
             </div>
             <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/35">
               {t.home.library}
@@ -450,8 +444,8 @@ export default function HomePage() {
             onClick={handleStartFreeSession}
             className="flex flex-col items-center gap-2 py-4 glass-premium rounded-[20px] active:scale-[0.96] transition-transform"
           >
-            <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-400/20 flex items-center justify-center">
-              <InfinityIcon size={18} className="text-rose-400" />
+            <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{ background: `${beadColor}10`, borderColor: `${beadColor}33` }}>
+              <InfinityIcon size={18} style={{ color: beadColor }} />
             </div>
             <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/35">
               {t.home.free}
