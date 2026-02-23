@@ -64,7 +64,7 @@ function StaticChapelet({
   readonly color?: string;
 }) {
   // Canvas
-  const W = 280, H = 318;
+  const W = 280, H = 350;
   const cx = 140;
 
   // Imame (pendant) en haut
@@ -73,7 +73,7 @@ function StaticChapelet({
   const junctionY = imaY + lr + 2; // jonction corde = bas imame
 
   // Forme teardrop — ovale (plus haut que large)
-  const rW = 62, rH = 96;
+  const rW = 50, rH = 110;
 
   const colorDark = useMemo(() => darkenHex(color), [color]);
 
@@ -337,16 +337,21 @@ export default function HomePage() {
 
         {/* ── QUOTE ───────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.8 }}
-          className="shrink-0 text-center px-3 -mt-1"
+          className="shrink-0 text-center px-3 py-4"
         >
-          <p className="text-[14px] leading-[1.8] text-white/75 font-light italic px-2">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <span className="text-white/30 text-xs">✦</span>
+            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-white/20 to-transparent" />
+          </div>
+          <p className="text-[15px] leading-[1.9] text-white/85 font-light italic px-2" style={{ letterSpacing: "0.3px" }}>
             &ldquo;{resolve(dailyQuote.text)}&rdquo;
           </p>
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">
-            {resolve(dailyQuote.source)}
+          <p className="text-[7px] font-black uppercase tracking-[0.5em] text-white/45 mt-4 ml-1">
+            — {resolve(dailyQuote.source)}
           </p>
         </motion.div>
 
@@ -355,9 +360,9 @@ export default function HomePage() {
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="flex-1 min-h-0 flex items-center justify-center"
+          className="flex-1 min-h-0 flex items-center justify-center pb-6"
         >
-          <div className="w-full max-w-[300px] aspect-square">
+          <div className="w-full max-w-[240px] aspect-square">
             <StaticChapelet
               total={20}
               count={Math.round(progress * 20)}
