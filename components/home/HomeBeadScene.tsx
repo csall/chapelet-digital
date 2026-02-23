@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, memo } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Environment, Sparkles, ContactShadows } from '@react-three/drei';
+import { useMemo, memo, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Environment, Sparkles, ContactShadows, Float, MeshTransmissionMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
 const NUM_BEADS = 33;
@@ -28,28 +28,38 @@ const Bead = memo(({ position, isDivider = false }: { position: THREE.Vector3; i
 
     return (
         <mesh position={position}>
-            <sphereGeometry args={[size, 24, 24]} />
+            <sphereGeometry args={[size, 32, 32]} />
             {isDivider ? (
-                /* Gold Divider bead */
+                /* Premium Gold Divider bead with prismatic metallic finish */
                 <meshPhysicalMaterial
-                    color="#fbbf24"
-                    metalness={0.9}
-                    roughness={0.15}
-                    envMapIntensity={2}
+                    color="#fcd34d"
+                    metalness={1}
+                    roughness={0.05}
+                    envMapIntensity={2.5}
                     clearcoat={1}
+                    clearcoatRoughness={0.1}
+                    iridescence={0.8}
+                    iridescenceIOR={1.5}
                 />
             ) : (
-                /* Polished Obsidian bead */
-                <meshPhysicalMaterial
-                    color="#18181b"
-                    metalness={0.1}
-                    roughness={0.02}
-                    transmission={0.05}
-                    thickness={0.5}
+                /* Advanced Transmission Material for deep sapphire/celestial effect */
+                <MeshTransmissionMaterial
+                    backside
+                    backsideThickness={0.5}
+                    thickness={1.2}
+                    samples={8}
+                    transmission={0.95}
                     clearcoat={1}
                     clearcoatRoughness={0}
-                    envMapIntensity={4}
-                    reflectivity={1}
+                    chromaticAberration={0.08}
+                    anisotropy={0.2}
+                    distortion={0.1}
+                    distortionScale={0.1}
+                    temporalDistortion={0.1}
+                    ior={1.6}
+                    color="#2563eb"
+                    attenuationDistance={0.6}
+                    attenuationColor="#60a5fa"
                 />
             )}
         </mesh>
@@ -73,7 +83,7 @@ const Cord = memo(() => {
 
     return (
         <mesh geometry={geometry}>
-            <meshStandardMaterial color="#2d2d30" roughness={0.8} />
+            <meshStandardMaterial color="#1e3a8a" roughness={0.3} metalness={0.5} />
         </mesh>
     );
 });
@@ -83,27 +93,45 @@ const Tassel = memo(() => {
 
     return (
         <group position={[startPoint.x, startPoint.y - 0.15, 0]}>
-            {/* Imame / Head Bead - Multi-tiered gold */}
+            {/* Imame / Head Bead - Multi-tiered gold with blue accent */}
             <mesh position={[0, 0, 0]}>
                 <cylinderGeometry args={[0.06, 0.09, 0.3, 16]} />
-                <meshStandardMaterial color="#fbbf24" metalness={0.9} roughness={0.1} />
+                <meshPhysicalMaterial
+                    color="#fbbf24"
+                    metalness={1}
+                    roughness={0.1}
+                    envMapIntensity={2}
+                    clearcoat={1}
+                />
             </mesh>
             <mesh position={[0, -0.2, 0]}>
-                <sphereGeometry args={[0.1, 16, 16]} />
-                <meshStandardMaterial color="#fbbf24" metalness={0.9} roughness={0.1} />
+                <sphereGeometry args={[0.1, 24, 24]} />
+                <meshPhysicalMaterial
+                    color="#2563eb"
+                    metalness={0.8}
+                    roughness={0.1}
+                    envMapIntensity={2}
+                    clearcoat={1}
+                />
             </mesh>
 
-            {/* Tassel threads */}
+            {/* Tassel threads with blueish gold shimmer */}
             <group position={[0, -0.3, 0]}>
-                {[...Array(12)].map((_, i) => {
-                    const angle = (i / 12) * Math.PI * 2;
+                {[...Array(16)].map((_, i) => {
+                    const angle = (i / 16) * Math.PI * 2;
                     const spread = 0.08;
                     const endX = Math.cos(angle) * spread;
                     const endZ = Math.sin(angle) * spread;
                     return (
-                        <mesh key={i} rotation={[0.1, angle, 0]} position={[endX / 2, -0.4, endZ / 2]}>
-                            <cylinderGeometry args={[0.006, 0.006, 0.8, 4]} />
-                            <meshStandardMaterial color="#fbbf24" opacity={0.8} transparent />
+                        <mesh key={i} rotation={[0.15, angle, 0]} position={[endX / 2, -0.4, endZ / 2]}>
+                            <cylinderGeometry args={[0.005, 0.005, 0.8, 4]} />
+                            <meshStandardMaterial
+                                color="#60a5fa"
+                                opacity={0.7}
+                                transparent
+                                metalness={0.8}
+                                roughness={0.2}
+                            />
                         </mesh>
                     );
                 })}
@@ -126,39 +154,76 @@ const ChapeletModel = memo(() => {
     }, []);
 
     return (
-        <group rotation={[0.4, 0, 0]} position={[0, 0.2, 0]}>
-            <Cord />
-            {beads.map((b, i) => <Bead key={i} position={b.pos} isDivider={b.isDivider} />)}
-            <Tassel />
-        </group>
+        <Float
+            speed={1.5}
+            rotationIntensity={0.4}
+            floatIntensity={0.6}
+            floatingRange={[-0.2, 0.2]}
+        >
+            <group rotation={[0.4, 0, 0]} position={[0, 0.2, 0]}>
+                <Cord />
+                {beads.map((b, i) => <Bead key={i} position={b.pos} isDivider={b.isDivider} />)}
+                <Tassel />
+            </group>
+        </Float>
     );
 });
+
+const DynamicLights = () => {
+    const lightRef = useRef<THREE.PointLight>(null);
+
+    useFrame((state) => {
+        if (!lightRef.current) return;
+        const { x, y } = state.mouse;
+        // Map mouse [-1, 1] to light position
+        lightRef.current.position.set(x * 5, y * 5, 5);
+    });
+
+    return (
+        <>
+            <pointLight ref={lightRef} intensity={20} color="#3b82f6" distance={20} decay={2} />
+            <spotLight position={[10, 20, 10]} intensity={50} angle={0.2} penumbra={1} color="#60a5fa" castShadow />
+            <pointLight position={[-10, -10, -10]} intensity={15} color="#1e40af" />
+        </>
+    );
+};
 
 export const HomeBeadScene = memo(({ cameraY = 0 }: { cameraY?: number }) => (
     <Canvas
         dpr={[1, 1.5]}
         camera={{ position: [0, cameraY, 5], fov: 45 }}
-        gl={{ alpha: true, antialias: false, powerPreference: 'default' }}
-        frameloop="demand" // Only render on demand - extreme energy savings
+        gl={{
+            alpha: true,
+            antialias: true,
+            powerPreference: 'high-performance',
+            stencil: false,
+            depth: true
+        }}
         style={{ background: 'transparent', width: '100%', height: '100%' }}
     >
-        <ambientLight intensity={0.5} />
-        <spotLight position={[5, 10, 10]} intensity={20} angle={0.2} penumbra={1} color="#ffffff" />
-        <pointLight position={[-5, -5, 5]} intensity={10} color="#6366f1" />
+        <ambientLight intensity={0.4} />
+        <DynamicLights />
 
-        <Environment preset="city" />
+        <Environment preset="night" />
 
         <ChapeletModel />
 
         <ContactShadows
             position={[0, -2.8, 0]}
-            opacity={0.4}
+            opacity={0.3}
             scale={10}
-            blur={3}
+            blur={3.5}
             far={5}
         />
 
-        <Sparkles count={15} scale={5} size={2} speed={0} opacity={0.15} color="#fbbf24" />
+        <Sparkles
+            count={30}
+            scale={6}
+            size={1.5}
+            speed={0.5}
+            opacity={0.4}
+            color="#60a5fa"
+        />
     </Canvas>
 ));
 HomeBeadScene.displayName = "HomeBeadScene";

@@ -24,15 +24,15 @@ export const en = {
         greeting_morning: "Good morning",
         sub_morning: "Peaceful morning",
         greeting_afternoon: "Good afternoon",
-        sub_afternoon: "Stay centered",
+        sub_afternoon: "Find your center",
         greeting_evening: "Good evening",
-        sub_evening: "Evening relaxation",
+        sub_evening: "Peace and serenity",
         greeting_night: "Good night",
-        sub_night: "Inner peace",
+        sub_night: "Inner rest",
         progression: "Progress",
         explorer: "Explore",
         library: "Library",
-        free: "Free",
+        free: "Free session",
     },
     session: {
         sound: "Sound",
@@ -97,7 +97,7 @@ export const en = {
         title: "Support & Help",
         subtitle: "We are here to help you get the most out of Chapelet Digital.",
         question: "Any questions?",
-        description: "Feel free to write to me for any suggestions or problems encountered.",
+        description: "Your feedback is valuable to us. Please feel free to share your suggestions or any difficulties you may encounter.",
         faqTitle: "Quick FAQ",
         faq: [
             {
@@ -123,8 +123,8 @@ export const en = {
         ]
     },
     privacy: {
-        title: "Your privacy is sacred.",
-        subtitle: "Chapelet Digital is designed for peace of mind, without compromising your privacy.",
+        title: "Your privacy is our priority.",
+        subtitle: "Chapelet Digital is designed for your serenity, ensuring absolute respect for your privacy.",
         lastUpdate: "Updated: February 19, 2026",
         summary: "In summary",
         summaryText: "Chapelet Digital is a dhikr counter application operating without account creation and without collection of personal data.",

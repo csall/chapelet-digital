@@ -4,6 +4,7 @@ import React, { useRef, useMemo, memo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, PerspectiveCamera, MeshDistortMaterial, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import { useSessionStore } from '@/lib/store/sessionStore';
 
 /* ── Shader ───────────────────────────────────────────────── */
 const LiquidNebulaMaterial = {
@@ -90,7 +91,7 @@ const LiquidNebulaMaterial = {
 };
 
 /* ── Indigo/violet particles ──────────────────────────────── */
-const BioluminescentParticles = ({ count = 1200 }: { count?: number }) => {
+const BioluminescentParticles = ({ count = 1200, color = "#a5b4fc" }: { count?: number; color?: string }) => {
     const points = useMemo(() => {
         const p = new Float32Array(count * 3);
         for (let i = 0; i < count; i++) {
@@ -114,7 +115,7 @@ const BioluminescentParticles = ({ count = 1200 }: { count?: number }) => {
     return (
         <Points ref={ref} positions={points} stride={3}>
             <PointMaterial
-                transparent color="#a5b4fc" size={0.04}
+                transparent color={color} size={0.04}
                 sizeAttenuation depthWrite={false}
                 blending={THREE.AdditiveBlending} opacity={0.55}
             />
@@ -154,7 +155,7 @@ const GoldParticles = ({ count = 350 }: { count?: number }) => {
 };
 
 /* ── Rose accent particles ────────────────────────────────── */
-const RoseParticles = ({ count = 250 }: { count?: number }) => {
+const RoseParticles = ({ count = 250, color = "#fb7185" }: { count?: number; color?: string }) => {
     const points = useMemo(() => {
         const p = new Float32Array(count * 3);
         for (let i = 0; i < count; i++) {
@@ -176,7 +177,7 @@ const RoseParticles = ({ count = 250 }: { count?: number }) => {
     return (
         <Points ref={ref} positions={points} stride={3}>
             <PointMaterial
-                transparent color="#fb7185" size={0.032}
+                transparent color={color} size={0.032}
                 sizeAttenuation depthWrite={false}
                 blending={THREE.AdditiveBlending} opacity={0.2}
             />
@@ -214,7 +215,7 @@ const EtherealBead = ({
 );
 
 /* ── Scene ────────────────────────────────────────────────── */
-const BackgroundScene = () => {
+const BackgroundScene = ({ beadColor }: { beadColor: string }) => {
     const materialRef = useRef<THREE.ShaderMaterial>(null);
     const lightARef = useRef<THREE.PointLight>(null);
     const lightBRef = useRef<THREE.PointLight>(null);
@@ -241,51 +242,55 @@ const BackgroundScene = () => {
             </mesh>
 
             {/* Particle systems */}
-            <BioluminescentParticles count={1200} />
+            <BioluminescentParticles count={1200} color={beadColor} />
             <GoldParticles count={350} />
-            <RoseParticles count={250} />
+            <RoseParticles count={250} color={beadColor} />
 
-            {/* Floating glass beads */}
-            <EtherealBead position={[-7, 5, -3]} size={0.65} color="#818cf8" />
-            <EtherealBead position={[8, -5, -2]} size={1.55} color="#f472b6" />
+            {/* Floating glass beads - Synchronized with user color */}
+            <EtherealBead position={[-7, 5, -3]} size={0.65} color={beadColor} />
+            <EtherealBead position={[8, -5, -2]} size={1.55} color={beadColor} />
             <EtherealBead position={[-4, -7, -4]} size={0.85} color="#fbbf24" />
-            <EtherealBead position={[3, 7, -6]} size={1.35} color="#6366f1" />
-            <EtherealBead position={[0, 0, -10]} size={2.7} color="#3730a3" />
-            <EtherealBead position={[10, 2, -5]} size={0.55} color="#34d399" />
+            <EtherealBead position={[3, 7, -6]} size={1.35} color={beadColor} />
+            <EtherealBead position={[0, 0, -10]} size={2.7} color={new THREE.Color(beadColor).multiplyScalar(0.2).getStyle()} />
+            <EtherealBead position={[10, 2, -5]} size={0.55} color={beadColor} />
             <EtherealBead position={[-9, -3, -7]} size={1.0} color="#fb923c" />
-            <EtherealBead position={[5, -9, -3]} size={0.7} color="#c084fc" />
+            <EtherealBead position={[5, -9, -3]} size={0.7} color={beadColor} />
 
             {/* Lights */}
             <ambientLight intensity={0.45} />
-            <pointLight ref={lightARef} intensity={5.5} distance={30} color="#818cf8" decay={2} />
-            <pointLight ref={lightBRef} intensity={3.5} distance={22} color="#f472b6" decay={2} />
+            <pointLight ref={lightARef} intensity={5.5} distance={30} color={beadColor} decay={2} />
+            <pointLight ref={lightBRef} intensity={3.5} distance={22} color={beadColor} decay={2} />
             <pointLight position={[14, 14, 5]} intensity={2} color="#ffffff" />
-            <pointLight position={[-14, -14, -5]} intensity={1.5} color="#4f46e5" />
+            <pointLight position={[-14, -14, -5]} intensity={1.5} color={beadColor} />
             <pointLight position={[0, -12, 0]} intensity={1.2} color="#fbbf24" decay={2} />
         </>
     );
 };
 
 /* ── Export ───────────────────────────────────────────────── */
-export const HomeBackground = memo(() => (
-    <div className="fixed inset-0 -z-10 pointer-events-none bg-[#010208]">
-        <Canvas dpr={[1, 2]} gl={{ alpha: true, antialias: true }}>
-            <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
-            <BackgroundScene />
-            <fog attach="fog" args={["#010208", 10, 30]} />
-        </Canvas>
+export const HomeBackground = memo(() => {
+    const beadColor = useSessionStore((state) => state.beadColor);
 
-        {/* Grain overlay */}
-        <div className="absolute inset-0 opacity-[0.055] pointer-events-none mix-blend-soft-light scale-125">
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
+    return (
+        <div className="fixed inset-0 -z-10 pointer-events-none bg-[#010208]">
+            <Canvas dpr={[1, 2]} gl={{ alpha: true, antialias: true }}>
+                <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
+                <BackgroundScene beadColor={beadColor} />
+                <fog attach="fog" args={["#010208", 10, 30]} />
+            </Canvas>
+
+            {/* Grain overlay */}
+            <div className="absolute inset-0 opacity-[0.055] pointer-events-none mix-blend-soft-light scale-125">
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
+            </div>
+
+            {/* Soft vignette */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_25%,rgba(1,2,8,0.7)_100%)]" />
+
+            {/* Top fade for status bar readability */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[rgba(1,2,8,0.4)] to-transparent" />
         </div>
-
-        {/* Soft vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_25%,rgba(1,2,8,0.7)_100%)]" />
-
-        {/* Top fade for status bar readability */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[rgba(1,2,8,0.4)] to-transparent" />
-    </div>
-));
+    );
+});
 
 HomeBackground.displayName = "HomeBackground";

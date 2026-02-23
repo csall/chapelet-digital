@@ -23,16 +23,16 @@ export const fr = {
     home: {
         greeting_morning: "Bonjour",
         sub_morning: "Matinée paisible",
-        greeting_afternoon: "Après-midi",
-        sub_afternoon: "Restez centré",
+        greeting_afternoon: "Bon après-midi",
+        sub_afternoon: "Trouvez votre centre",
         greeting_evening: "Bonsoir",
-        sub_evening: "Détente du soir",
-        greeting_night: "Bonne nuit",
-        sub_night: "Paix intérieure",
+        sub_evening: "Paix et sérénité",
+        greeting_night: "Douce nuit",
+        sub_night: "Repos intérieur",
         progression: "Progression",
         explorer: "Explorer",
-        library: "Biblio",
-        free: "Libre",
+        library: "Bibliothèque",
+        free: "Session libre",
     },
     session: {
         sound: "Son",
@@ -63,7 +63,7 @@ export const fr = {
         newCollection: "Collection",
         newInvocation: "Invocation",
         groupInvocations: "Grouper des invocations",
-        createDhikr: "Créer une nouvelle dhikr",
+        createDhikr: "Créer un nouveau dhikr",
         noFavorites: "Aucun favori",
         addFavoriteTip: "Touchez l'étoile sur une invocation ou une collection pour l'ajouter ici.",
         launch: "Lancer",
@@ -97,7 +97,7 @@ export const fr = {
         title: "Support & Aide",
         subtitle: "Nous sommes là pour vous aider à tirer le meilleur parti de Chapelet Digital.",
         question: "Une question ?",
-        description: "N'hésitez pas à m'écrire pour toute suggestion ou problème rencontré.",
+        description: "Votre avis nous est précieux. N'hésitez pas à nous faire part de vos suggestions ou de toute difficulté rencontrée.",
         faqTitle: "FAQ Rapide",
         faq: [
             {
@@ -123,8 +123,8 @@ export const fr = {
         ]
     },
     privacy: {
-        title: "Votre vie privée est sacrée.",
-        subtitle: "Chapelet Digital est conçu pour la paix de l'esprit, sans compromis sur votre confidentialité.",
+        title: "Votre confidentialité est notre priorité.",
+        subtitle: "Chapelet Digital est conçu pour votre sérénité, en garantissant un respect total de votre vie privée.",
         lastUpdate: "Mise à jour : 19 février 2026",
         summary: "En résumé",
         summaryText: "Chapelet Digital est une application de compteur de dhikr fonctionnant sans création de compte et sans collecte de données personnelles.",
