@@ -45,6 +45,10 @@ export function BottomNav() {
 
     const isReady = isMounted && hasHydrated;
 
+    if (!isMounted) return null;
+    // Do not show bottom nav on info landing page
+    if (pathname?.startsWith("/info")) return null;
+
     return (
         <nav
             aria-label="Navigation principale"
