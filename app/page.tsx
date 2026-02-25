@@ -127,7 +127,33 @@ export default function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* SECONDARY CTA - WEB APP */}
+          {/* SECONDARY CTA - ANDROID (COMING SOON) */}
+          <motion.div
+            initial={{ opacity: 0, y: 15, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.55, duration: 0.5, type: "spring" }}
+          >
+            <div
+              className="group relative flex items-center justify-between gap-5 bg-slate-100 text-slate-400 p-5 rounded-[28px] border border-slate-200 cursor-not-allowed opacity-80"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-11 h-11 rounded-xl bg-slate-200 text-slate-400 flex items-center justify-center">
+                  <Play size={22} className="opacity-40" />
+                </div>
+                <div className="text-left">
+                  <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Android & Play Store</p>
+                  <p className="text-lg font-black leading-none tracking-tight">Prochainement</p>
+                </div>
+              </div>
+              <div className="pr-1">
+                <div className="px-3 py-1 rounded-full bg-slate-200 text-[9px] font-black uppercase tracking-tighter">
+                  Soon
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* TERTIARY CTA - WEB APP */}
           <motion.div
             initial={{ opacity: 0, y: 15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
