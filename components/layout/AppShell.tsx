@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils/cn";
 import { ReactNode } from "react";
 
 const navItems: Array<{ label: string; href: string; icon: LucideIcon; helper?: string }> = [
-  { label: "Dashboard", href: "/", icon: Home, helper: "Vue d'ensemble" },
+  { label: "Dashboard", href: "/app", icon: Home, helper: "Vue d'ensemble" },
   { label: "Session", href: "/session", icon: Timer, helper: "Chapelet actif" },
   { label: "Bibliothèque", href: "/library", icon: LibraryBig, helper: "Prières & presets" },
   { label: "Réglages", href: "/settings", icon: Settings, helper: "Profil & rappels" },

@@ -10,7 +10,7 @@ import { useSessionStore } from "@/lib/store/sessionStore";
 
 // ─── Static config ─────────────────────────────────────────
 const NAV_ITEMS: { href: string; labelKey: string; icon: LucideIcon }[] = [
-    { href: "/", labelKey: "home", icon: LayoutDashboard },
+    { href: "/app", labelKey: "home", icon: LayoutDashboard },
     { href: "/session", labelKey: "session", icon: Sparkles },
     { href: "/library", labelKey: "library", icon: BookOpen },
     { href: "/preferences", labelKey: "preferences", icon: Settings },
@@ -46,8 +46,8 @@ export function BottomNav() {
     const isReady = isMounted && hasHydrated;
 
     if (!isMounted) return null;
-    // Do not show bottom nav on info landing page
-    if (pathname?.startsWith("/info")) return null;
+    // Do not show bottom nav on info landing pages
+    if (pathname === "/" || pathname?.startsWith("/info")) return null;
 
     return (
         <nav
