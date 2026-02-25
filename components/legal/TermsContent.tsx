@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Scale, ShieldAlert, BookOpen, Mail, FileText } from "lucide-react";
+import { Scale, ShieldAlert, BookOpen, Mail, FileText } from "lucide-react";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import { en } from "@/lib/translations/en";
 import { fr } from "@/lib/translations/fr";
@@ -23,10 +23,7 @@ export default function TermsContent({ forceLocale }: { forceLocale?: 'fr' | 'en
             {/* Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar touch-pan-y">
                 <main className="relative max-w-3xl mx-auto px-6 pt-[calc(env(safe-area-inset-top)+2rem)] pb-32 space-y-12">
-                    <Link href="/about" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors mb-8">
-                        <ArrowLeft size={20} />
-                        <span>{t.common.back}</span>
-                    </Link>
+
 
                     {/* Intro Section */}
                     <div className="space-y-6 text-center">

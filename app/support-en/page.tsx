@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, HelpCircle, Mail, Smartphone, Volume2, Sparkles, BookOpen, Palette, Send } from "lucide-react";
+import { HelpCircle, Mail, Smartphone, Volume2, Sparkles, BookOpen, Palette, Send } from "lucide-react";
 import { en } from "@/lib/translations/en";
 
 const t = en;
@@ -17,10 +17,7 @@ export default function SupportPageEn() {
 
             <div className="flex-1 overflow-y-auto no-scrollbar touch-pan-y">
                 <main className="relative max-w-3xl mx-auto px-6 pt-[calc(env(safe-area-inset-top)+2rem)] pb-32 space-y-8">
-                    <Link href="/about" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors mb-8" aria-label="Back to settings">
-                        <ArrowLeft size={20} />
-                        <span>{t.common.back}</span>
-                    </Link>
+
 
                     {/* Intro */}
                     <div className="space-y-6 text-center">
