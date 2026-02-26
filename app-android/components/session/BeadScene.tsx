@@ -186,6 +186,7 @@ interface BeadSceneProps {
     total: number;
     onAdvance: () => void;
     interactive?: boolean;
+    onLoaded?: () => void;
 }
 
 
@@ -278,7 +279,7 @@ const SceneInternal = memo(({ count, beadWindow, total, presetId, tapProgress }:
 });
 SceneInternal.displayName = "SceneInternal";
 
-export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneProps) => {
+export const BeadScene = memo(({ presetId, count, total, onAdvance, onLoaded }: BeadSceneProps) => {
     const isDragging = useRef(false);
     const isInteractiveRef = useRef(!useSessionStore.getState().isUiOpen && !useSessionStore.getState().isComplete);
     const [isUiOpen, setIsUiOpen] = useState(useSessionStore.getState().isUiOpen);
@@ -365,52 +366,56 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
     if (presetId === "none") return <div className="h-full w-full bg-slate-950" />;
 
     return (
-        <button
-            type="button"
-            tabIndex={isUiOpen ? -1 : 0}
-            aria-label={`Chapelet — appuyer pour avancer (${count} sur ${total})`}
-            className={`h-full w-full cursor-pointer touch-none select-none bg-transparent border-0 p-0 ${isUiOpen ? 'pointer-events-none' : ''}`}
-            onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
-            onKeyDown={handleKeyDown}
-        >
-            <Canvas
-                key="main-bead-canvas"
-                frameloop="demand"
-                shadows
-                camera={{
-                    position: [0, 0, 5],
-                    fov: 60
-                }}
-                gl={{
-                    antialias: false,
-                    alpha: true,
-                    powerPreference: "default",
-                }}
-                dpr={[1, 2]}
-                onCreated={(state) => {
-                    state.gl.setClearColor(0x000000, 0); // Always transparent to show page mesh glows
-                }}
-                style={{ width: '100%', height: '100%' }}
+        <div className="relative h-full w-full">
+            <button
+                type="button"
+                tabIndex={isUiOpen ? -1 : 0}
+                aria-label={`Chapelet — appuyer pour avancer (${count} sur ${total})`}
+                className={`h-full w-full cursor-pointer touch-none select-none bg-transparent border-0 p-0 ${isUiOpen ? 'pointer-events-none' : ''}`}
+                onPointerDown={handlePointerDown}
+                onPointerUp={handlePointerUp}
+                onKeyDown={handleKeyDown}
             >
-                <ambientLight intensity={isLight ? 0.8 : 0.25} />
-                <spotLight position={[10, 25, 15]} angle={0.3} penumbra={1} intensity={isLight ? 3.5 : 2.5} castShadow />
-                <pointLight position={[-10, 5, -10]} intensity={isLight ? 0.5 : 1.5} color={isLight ? "#a78bfa" : "#f43f5e"} />
+                <Canvas
+                    key="main-bead-canvas"
+                    frameloop="demand"
+                    shadows
+                    camera={{
+                        position: [0, 0, 5],
+                        fov: 60
+                    }}
+                    gl={{
+                        antialias: false,
+                        alpha: true,
+                        powerPreference: "default",
+                    }}
+                    dpr={[1, 2]}
+                    onCreated={(state) => {
+                        state.gl.setClearColor(0x000000, 0); // Always transparent to show page mesh glows
+                        // Small delay to ensure perles are painted
+                        setTimeout(() => onLoaded?.(), 100);
+                    }}
+                    style={{ width: '100%', height: '100%' }}
+                >
+                    <ambientLight intensity={isLight ? 0.8 : 0.25} />
+                    <spotLight position={[10, 25, 15]} angle={0.3} penumbra={1} intensity={isLight ? 3.5 : 2.5} castShadow />
+                    <pointLight position={[-10, 5, -10]} intensity={isLight ? 0.5 : 1.5} color={isLight ? "#a78bfa" : "#f43f5e"} />
 
-                <Environment preset="warehouse" />
+                    <Environment preset="warehouse" />
 
-                <SceneInternal
-                    presetId={presetId}
-                    count={count}
-                    beadWindow={beadWindow}
-                    total={total}
-                    tapProgress={tapProgress}
-                />
+                    <SceneInternal
+                        presetId={presetId}
+                        count={count}
+                        beadWindow={beadWindow}
+                        total={total}
+                        tapProgress={tapProgress}
+                    />
 
-                <ZenRipple trigger={count} color={isLight ? "#6366f1" : (beadColor as string)} />
-                <fog attach="fog" args={[isLight ? '#eeeef2' : '#05070c', isLight ? 6 : 4, isLight ? 30 : 25]} />
-            </Canvas>
-        </button>
+                    <ZenRipple trigger={count} color={isLight ? "#6366f1" : (beadColor as string)} />
+                    <fog attach="fog" args={[isLight ? '#eeeef2' : '#05070c', isLight ? 6 : 4, isLight ? 30 : 25]} />
+                </Canvas>
+            </button>
+        </div>
     );
 });
 

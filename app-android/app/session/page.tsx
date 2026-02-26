@@ -311,7 +311,7 @@ SessionHeader.displayName = "SessionHeader";
 // ─────────────────────────────────────────────────────────────
 // LAYER 2: Bead Scene
 // ─────────────────────────────────────────────────────────────
-const BeadLayer = memo(() => {
+const BeadLayer = memo(({ onLoaded }: { onLoaded: () => void }) => {
   const presetId = useSessionStore(state => state.preset?.id || "none");
   const advance = useSessionStore(state => state.advance);
   const progress = useSessionProgress();
@@ -349,6 +349,7 @@ const BeadLayer = memo(() => {
       count={count}
       total={total}
       onAdvance={handleAdvance}
+      onLoaded={onLoaded}
     />
   );
 });
@@ -363,8 +364,10 @@ function SessionContent() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [_hydrated, _setHydrated] = useState(false);
+  const [isSceneLoaded, setIsSceneLoaded] = useState(false);
   const hasHydrated = useSessionStore(state => state._hasHydrated);
   const { t, resolve } = useTranslation();
+
 
   useEffect(() => {
     setIsMounted(true);
@@ -497,14 +500,51 @@ function SessionContent() {
       />
 
       {/* Main interactive area - Bead Scene area taking remaining vertical space */}
-      <div className={`flex-1 relative z-0 transition-all duration-1000 ${isAnyModalOpen ? 'pointer-events-none opacity-40 blur-sm grayscale' : isComplete ? 'pointer-events-none opacity-60' : 'opacity-100'}`}>
+      <div className={`flex-1 relative z-0 transition-opacity duration-700 ${!isSceneLoaded ? 'opacity-0' : 'opacity-100'} ${isAnyModalOpen ? 'pointer-events-none opacity-40 blur-sm grayscale' : isComplete ? 'pointer-events-none opacity-60' : ''}`}>
         <div className="absolute inset-0 top-0 h-full">
-          <BeadLayer />
+          <BeadLayer onLoaded={() => setIsSceneLoaded(true)} />
         </div>
       </div>
 
+      <AnimatePresence>
+        {!isSceneLoaded && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-[60] bg-slate-950 flex flex-col items-center justify-center gap-6"
+          >
+            {/* Spinning matched orb */}
+            <div className="relative w-16 h-16">
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full blur-xl"
+                style={{ backgroundColor: beadColor }}
+              />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                className="w-full h-full rounded-full border-t-2 border-r-2"
+                style={{ borderColor: beadColor }}
+              />
+            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 0.5, y: 0 }}
+              className="text-[10px] font-black uppercase tracking-[0.4em] text-white"
+            >
+              Initialisation...
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <FullscreenModal isOpen={isSettingsOpen} onClose={closeSettings} title={t.settings.title}>
+
         <SettingsContent />
       </FullscreenModal>
 
