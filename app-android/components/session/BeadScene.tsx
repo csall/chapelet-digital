@@ -93,24 +93,19 @@ const Pearl = memo(({ position, activeProgress, idx, rotation = [0, 0, 0], tapPr
                 <animated.mesh
                     ref={meshRef}
                     scale={animatedScale as any}
-                    castShadow
-                    receiveShadow
                 >
                     <sphereGeometry args={[1, 32, 32]} />
                     <animated.meshPhysicalMaterial
                         color={interpolatedColor}
-                        roughness={roughness}
-                        metalness={metalness}
-                        transmission={transmission}
-                        thickness={thickness}
-                        envMapIntensity={envMapIntensity}
-                        clearcoat={1}
-                        clearcoatRoughness={0.05}
-                        reflectivity={1}
+                        roughness={0.25}
+                        metalness={0.1}
+                        clearcoat={0.8}
+                        clearcoatRoughness={0.2}
+                        reflectivity={0.5}
                         emissive={interpolatedColor}
                         emissiveIntensity={to([activeProgress, tapProgress], (ap, tp) => {
                             // Base core light + Tap flash (masked for active only)
-                            return ap * 0.5 + (tp * 5 * Math.pow(ap, 3));
+                            return ap * 0.25 + (tp * 4 * Math.pow(ap, 3));
                         })}
                     />
 
@@ -125,13 +120,15 @@ Pearl.displayName = "Pearl";
 const ConnectionString = memo(() => {
     return (
         <mesh>
-            <cylinderGeometry args={[0.04, 0.04, 20, 8]} />
-            <meshStandardMaterial
-                color="#94a3b8"
-                roughness={0.4}
-                metalness={0.3}
-                emissive="#475569"
-                emissiveIntensity={0.3}
+            <cylinderGeometry args={[0.02, 0.02, 20, 12]} />
+            <meshPhysicalMaterial
+                color="#e2e8f0"
+                roughness={0.2}
+                metalness={0.8}
+                clearcoat={1}
+                clearcoatRoughness={0.1}
+                emissive="#94a3b8"
+                emissiveIntensity={0.2}
             />
         </mesh>
     );
@@ -378,8 +375,7 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance, onLoaded }: 
             >
                 <Canvas
                     key="main-bead-canvas"
-                    frameloop="demand"
-                    shadows
+                    frameloop="always"
                     camera={{
                         position: [0, 0, 5],
                         fov: 60
@@ -397,11 +393,14 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance, onLoaded }: 
                     }}
                     style={{ width: '100%', height: '100%' }}
                 >
-                    <ambientLight intensity={isLight ? 0.8 : 0.25} />
-                    <spotLight position={[10, 25, 15]} angle={0.3} penumbra={1} intensity={isLight ? 3.5 : 2.5} castShadow />
-                    <pointLight position={[-10, 5, -10]} intensity={isLight ? 0.5 : 1.5} color={isLight ? "#a78bfa" : "#f43f5e"} />
+                    <ambientLight intensity={1.5} />
+                    {/* Main Soft Key Light */}
+                    <directionalLight position={[5, 10, 7.5]} intensity={2.5} />
+                    {/* Soft Rim Light */}
+                    <spotLight position={[-5, 5, -5]} angle={0.3} penumbra={1} intensity={15} color="#ffffff" />
+                    {/* Subtle color fill */}
+                    <pointLight position={[0, -5, 5]} intensity={5} color={isLight ? "#ffffff" : (beadColor as string)} />
 
-                    <Environment preset="warehouse" />
 
                     <SceneInternal
                         presetId={presetId}

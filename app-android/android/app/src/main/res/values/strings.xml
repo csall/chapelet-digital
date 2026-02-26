@@ -4,4 +4,5 @@
     <string name="title_activity_main">Chapelet Digital</string>
     <string name="package_name">com.cheikh.chapeletdigital</string>
     <string name="custom_url_scheme">com.cheikh.chapeletdigital</string>
+    <string name="attribution_label">Accessibilité et Audio</string>
 </resources>
