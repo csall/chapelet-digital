@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Chapelet Digital</string>
+    <string name="title_activity_main">Chapelet Digital</string>
+    <string name="package_name">com.cheikh.chapeletdigital</string>
+    <string name="custom_url_scheme">com.cheikh.chapeletdigital</string>
+</resources>
