@@ -49,7 +49,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── NAVBAR ─────────────────────────────────── */}
-      <nav className="relative z-20 flex justify-between items-center px-6 py-4 lg:px-12">
+      <nav className="relative z-20 flex justify-between items-center px-4 py-2 sm:px-6 sm:py-3 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -77,7 +77,7 @@ export default function LandingPage() {
         </motion.div>
       </nav>
 
-      <main className="flex-1 flex items-center justify-center z-10 px-3 xs:px-4 sm:px-6 py-4 xs:py-5 sm:py-6 lg:py-8">
+      <main className="flex-1 flex items-center justify-start sm:justify-center z-10 px-3 xs:px-4 sm:px-6 py-2 xs:py-3 sm:py-4 lg:py-6">
         <div className="w-full max-w-5xl">
           <div className="grid lg:grid-cols-2 gap-4 xs:gap-5 sm:gap-6 lg:gap-12 items-center">
 
