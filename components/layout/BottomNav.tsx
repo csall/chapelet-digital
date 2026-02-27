@@ -46,8 +46,10 @@ export function BottomNav() {
     const isReady = isMounted && hasHydrated;
 
     if (!isMounted) return null;
-    // Do not show bottom nav on info landing pages
-    if (pathname === "/" || pathname?.startsWith("/info")) return null;
+    // Do not show bottom nav on info landing pages and other pages
+    if (pathname === "/" || pathname?.startsWith("/info") ||
+        pathname?.startsWith("/support") || pathname?.startsWith("/privacy") ||
+        pathname?.startsWith("/terms")) return null;
 
     return (
         <nav
