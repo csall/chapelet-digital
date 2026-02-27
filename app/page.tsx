@@ -41,10 +41,10 @@ export default function LandingPage() {
       </div>
 
       <main className="flex-1 flex flex-col z-10 max-w-[500px] lg:max-w-4xl mx-auto w-full px-6 pt-10 pb-16 gap-8 lg:justify-center">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center gap-8 lg:gap-0">
 
           {/* ── HERO SECTION ───────────────────────── */}
-          <section className="flex flex-col items-center text-center lg:items-start lg:text-left gap-4 lg:gap-6">
+          <section className="flex flex-col items-center text-center gap-4 lg:gap-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}

@@ -311,7 +311,7 @@ SessionHeader.displayName = "SessionHeader";
 // ─────────────────────────────────────────────────────────────
 // LAYER 2: Bead Scene
 // ─────────────────────────────────────────────────────────────
-const BeadLayer = memo(({ onLoaded }: { onLoaded: () => void }) => {
+const BeadLayer = memo(() => {
   const presetId = useSessionStore(state => state.preset?.id || "none");
   const advance = useSessionStore(state => state.advance);
   const progress = useSessionProgress();
@@ -349,7 +349,6 @@ const BeadLayer = memo(({ onLoaded }: { onLoaded: () => void }) => {
       count={count}
       total={total}
       onAdvance={handleAdvance}
-      onLoaded={onLoaded}
     />
   );
 });
@@ -364,7 +363,7 @@ function SessionContent() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [_hydrated, _setHydrated] = useState(false);
-  const [isSceneLoaded, setIsSceneLoaded] = useState(false);
+  const [isSceneLoaded] = useState(true);
   const hasHydrated = useSessionStore(state => state._hasHydrated);
   const { t, resolve } = useTranslation();
 
@@ -502,7 +501,7 @@ function SessionContent() {
       {/* Main interactive area - Bead Scene area taking remaining vertical space */}
       <div className={`flex-1 relative z-0 transition-opacity duration-700 ${!isSceneLoaded ? 'opacity-0' : 'opacity-100'} ${isAnyModalOpen ? 'pointer-events-none opacity-40 blur-sm grayscale' : isComplete ? 'pointer-events-none opacity-60' : ''}`}>
         <div className="absolute inset-0 top-0 h-full">
-          <BeadLayer onLoaded={() => setIsSceneLoaded(true)} />
+          <BeadLayer />
         </div>
       </div>
 
