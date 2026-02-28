@@ -285,9 +285,9 @@ export default function HomePage() {
   return (
     <div className="h-[100dvh] text-slate-100 flex flex-col relative overflow-hidden touch-none font-sans select-none">
       {/* Background */}
-      <div className="fixed inset-0 -z-10 bg-[#010208]">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/30 via-[#010208] to-[#010208]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[45%] rounded-full blur-[120px]"
+      <div className="fixed inset-0 -z-10 bg-background">
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent dark:from-indigo-950/30 dark:via-[#010208] dark:to-[#010208]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[45%] rounded-full blur-[120px] opacity-20 dark:opacity-100"
           style={{ background: `${beadColor}0a` }} />
       </div>
 
@@ -308,10 +308,10 @@ export default function HomePage() {
               {greeting.icon}
             </div>
             <div>
-              <p className="text-[8px] font-black uppercase tracking-[0.5em] text-white/20 leading-none mb-0.5">
+              <p className="text-[8px] font-black uppercase tracking-[0.5em] text-foreground/30 dark:text-white/20 leading-none mb-0.5">
                 {t.home[`greeting_${greeting.key}` as keyof typeof t.home]}
               </p>
-              <p className="text-xs font-light text-white/60 tracking-wide">
+              <p className="text-xs font-light text-foreground/60 dark:text-white/60 tracking-wide">
                 {t.home[`sub_${greeting.key}` as keyof typeof t.home]}
               </p>
             </div>
@@ -325,7 +325,7 @@ export default function HomePage() {
                 onClick={() => useSessionStore.getState().setLanguage(lang)}
                 aria-label={`Switch to ${lang.toUpperCase()}`}
                 aria-pressed={language === lang}
-                className={`px-2 py-1 rounded-[8px] text-[10px] font-black transition-all ${language === lang ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"
+                className={`px-2 py-1 rounded-[8px] text-[10px] font-black transition-all ${language === lang ? "bg-foreground/10 dark:bg-white/10 text-foreground dark:text-white" : "text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60"
                   }`}
               >
                 {lang.toUpperCase()}
@@ -342,14 +342,14 @@ export default function HomePage() {
           className="shrink-0 text-center px-3 py-4"
         >
           <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            <span className="text-white/30 text-xs">✦</span>
-            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-white/20 to-transparent" />
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-400/30 dark:via-white/20 to-transparent" />
+            <span className="text-slate-400 dark:text-white/30 text-xs">✦</span>
+            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-slate-400/30 dark:via-white/20 to-transparent" />
           </div>
-          <p className="text-[15px] leading-[1.9] text-white/85 font-light italic px-2" style={{ letterSpacing: "0.3px" }}>
+          <p className="text-[15px] leading-[1.9] text-foreground/85 dark:text-white/85 font-light italic px-2" style={{ letterSpacing: "0.3px" }}>
             &ldquo;{resolve(dailyQuote.text)}&rdquo;
           </p>
-          <p className="text-[7px] font-black uppercase tracking-[0.5em] text-white/45 mt-4 ml-1">
+          <p className="text-[7px] font-black uppercase tracking-[0.5em] text-foreground/40 dark:text-white/45 mt-4 ml-1">
             — {resolve(dailyQuote.source)}
           </p>
         </motion.div>
@@ -405,10 +405,10 @@ export default function HomePage() {
                 <p className="text-[8px] font-black uppercase tracking-[0.4em] mb-1" style={{ color: beadColor, opacity: 0.8 }}>
                   {t.home.progression}
                 </p>
-                <p className="text-sm text-white/90 truncate font-semibold">
+                <p className="text-sm text-foreground/90 dark:text-white/90 truncate font-semibold">
                   {resolve(preset?.name)}
                 </p>
-                <p className="text-[10px] text-white/45 mt-0.5 tabular-nums">
+                <p className="text-[10px] text-foreground/45 dark:text-white/45 mt-0.5 tabular-nums">
                   {totalCount} / {preset?.totalBeads}
                 </p>
               </div>
