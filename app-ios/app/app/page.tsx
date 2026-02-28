@@ -12,6 +12,7 @@ import {
   Sunset,
   Infinity as InfinityIcon,
   Library,
+  ChevronRight,
 } from "lucide-react";
 import { getRandomQuote } from "@/lib/data/quotes";
 import { useTranslation } from "@/lib/hooks/useTranslation";
@@ -430,30 +431,32 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="shrink-0 grid grid-cols-2 gap-3"
+          className="shrink-0 flex flex-col gap-2.5"
         >
           <button
             onClick={() => router.push("/library")}
-            className="flex flex-col items-center gap-2 py-4 glass-premium rounded-[20px] active:scale-[0.96] transition-transform"
+            className="flex items-center gap-3.5 px-4 py-3.5 glass-premium rounded-[18px] active:opacity-70 transition-opacity"
           >
-            <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{ background: `${beadColor}10`, borderColor: `${beadColor}33` }}>
-              <Library size={16} style={{ color: beadColor }} />
+            <div className="w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0" style={{ background: `${beadColor}18`, border: `1px solid ${beadColor}35` }}>
+              <Library size={18} style={{ color: beadColor }} />
             </div>
-            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/35">
+            <span className="flex-1 text-[13px] font-semibold text-foreground/80 dark:text-white/80 text-left">
               {t.home.library}
             </span>
+            <ChevronRight size={16} className="text-foreground/20 dark:text-white/20 shrink-0" />
           </button>
 
           <button
             onClick={handleStartFreeSession}
-            className="flex flex-col items-center gap-2 py-4 glass-premium rounded-[20px] active:scale-[0.96] transition-transform"
+            className="flex items-center gap-3.5 px-4 py-3.5 glass-premium rounded-[18px] active:opacity-70 transition-opacity"
           >
-            <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{ background: `${beadColor}10`, borderColor: `${beadColor}33` }}>
+            <div className="w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0" style={{ background: `${beadColor}18`, border: `1px solid ${beadColor}35` }}>
               <InfinityIcon size={18} style={{ color: beadColor }} />
             </div>
-            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/35">
+            <span className="flex-1 text-[13px] font-semibold text-foreground/80 dark:text-white/80 text-left">
               {t.home.free}
             </span>
+            <ChevronRight size={16} className="text-foreground/20 dark:text-white/20 shrink-0" />
           </button>
         </motion.div>
 

@@ -19,7 +19,7 @@ const NAV_ITEMS: { href: string; labelKey: string; icon: LucideIcon }[] = [
 
 // ─── Shared nav classes ────────────────────────────────────
 const NAV_CLS =
-    "fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/85 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 pb-safe pt-2.5 select-none touch-none";
+    "fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#0a0d1a]/92 backdrop-blur-2xl border-t border-slate-200/40 dark:border-white/[0.06] pb-safe pt-2 select-none touch-none";
 
 // ─── Active path check (handles trailing slash) ────────────
 function matchPath(pathname: string, href: string): boolean {
@@ -34,6 +34,7 @@ export function BottomNav() {
     const { t } = useTranslation();
     const [isMounted, setIsMounted] = useState(false);
     const hasHydrated = useSessionStore(state => state._hasHydrated);
+    const beadColor = useSessionStore(state => state.beadColor);
 
     useEffect(() => {
         setIsMounted(true);
@@ -69,27 +70,27 @@ export function BottomNav() {
                             onClick={onTap}
                             aria-label={label}
                             aria-current={active ? "page" : undefined}
-                            className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 active:scale-95 transition-transform duration-100"
+                            className="relative flex flex-col items-center justify-center gap-1 min-w-[56px] py-2 active:scale-95 transition-transform duration-100"
                         >
+                            {/* Pill indicator behind active icon */}
+                            {active && (
+                                <div
+                                    className="absolute top-1 inset-x-2 h-[30px] rounded-2xl opacity-[0.13]"
+                                    style={{ backgroundColor: beadColor }}
+                                />
+                            )}
                             <Icon
                                 size={22}
-                                strokeWidth={active ? 2.4 : 1.7}
-                                className={active
-                                    ? "text-indigo-600 dark:text-white fill-indigo-500/10 dark:fill-white/10"
-                                    : "text-slate-400 dark:text-slate-500 fill-transparent"
-                                }
+                                strokeWidth={active ? 2.2 : 1.6}
+                                className={active ? "relative z-10" : "text-slate-400 dark:text-slate-500"}
+                                style={active ? { color: beadColor } : undefined}
                             />
                             <span
-                                className={`text-[10px] font-medium leading-tight h-4 flex items-center ${active
-                                    ? "text-indigo-600 dark:text-white"
-                                    : "text-slate-400 dark:text-slate-500"
-                                    }`}
+                                className={`text-[10px] font-medium leading-tight h-4 flex items-center relative z-10 ${active ? "" : "text-slate-400 dark:text-slate-500"}`}
+                                style={active ? { color: beadColor } : undefined}
                             >
                                 {label}
                             </span>
-                            {active && (
-                                <div className="w-4 h-0.5 rounded-full bg-indigo-500 dark:bg-white mt-0.5" />
-                            )}
                         </Link>
                     );
                 })}

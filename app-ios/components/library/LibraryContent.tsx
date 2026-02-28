@@ -282,7 +282,7 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                 </AnimatePresence>
 
                 {/* ── TABS ─────────────────────────── */}
-                <div role="tablist" aria-label="Catégories" className="flex gap-2">
+                <div role="tablist" aria-label="Catégories" className="flex gap-1 p-1 rounded-2xl bg-black/[0.06] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06]">
                     {[
                         { key: "invocations" as const, label: t.library.invocations, icon: <BookOpen size={13} aria-hidden="true" />, count: invocations.length },
                         { key: "collections" as const, label: t.library.collections, icon: <Sparkles size={13} aria-hidden="true" />, count: groups.length },
@@ -295,36 +295,33 @@ export function LibraryContent({ onSessionStart, onClose }: LibraryContentProps)
                                 role="tab"
                                 aria-selected={isActive}
                                 onClick={() => setActiveTab(tab.key)}
-                                whileTap={{ scale: 0.95 }}
-                                className="relative flex-1 flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl border transition-all duration-300"
+                                whileTap={{ scale: 0.96 }}
+                                className="relative flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-[14px] transition-all duration-200"
                                 style={isActive ? {
-                                    backgroundColor: beadColor + "18",
-                                    borderColor: beadColor + "45",
+                                    backgroundColor: beadColor + "22",
                                     color: beadColor,
-                                } : {
-                                    backgroundColor: "transparent",
-                                    borderColor: "rgba(128,128,128,0.1)",
-                                }}
+                                } : {}}
                             >
                                 <span className={isActive ? "" : "text-slate-400 dark:text-white/30"}>
                                     {tab.icon}
                                 </span>
-                                <span className={`text-[11px] font-bold leading-none ${isActive ? "" : "text-slate-500 dark:text-white/50"}`}>
+                                <span className={`text-[11px] font-semibold leading-none ${isActive ? "" : "text-slate-500 dark:text-white/40"}`}>
                                     {tab.label}
                                 </span>
-                                <span
-                                    className="text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none"
-                                    style={isActive ? {
-                                        backgroundColor: beadColor + "30",
-                                        color: beadColor,
-                                    } : {
-                                        backgroundColor: "rgba(128,128,128,0.1)",
-                                    }}
-                                >
-                                    <span className={isActive ? "" : "text-slate-500 dark:text-white/40"}>
+                                {tab.count > 0 && (
+                                    <span
+                                        className="text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+                                        style={isActive ? {
+                                            backgroundColor: beadColor + "30",
+                                            color: beadColor,
+                                        } : {
+                                            backgroundColor: "rgba(128,128,128,0.12)",
+                                            color: "rgba(128,128,128,0.5)",
+                                        }}
+                                    >
                                         {tab.count}
                                     </span>
-                                </span>
+                                )}
                             </motion.button>
                         );
                     })}
