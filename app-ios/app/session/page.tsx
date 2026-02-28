@@ -17,7 +17,7 @@ import { hapticLight, hapticMedium, hapticCelebration, hapticGravity } from "@/l
 
 const BeadScene = dynamic(
   () => import("@/components/session/BeadScene").then((mod) => mod.BeadScene),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 );
 
 const stopAllBubbles = (e: React.UIEvent | React.PointerEvent | React.MouseEvent | React.TouchEvent) => {
@@ -492,56 +492,8 @@ function SessionContent() {
     );
   }
 
-  const showLoading = !isSceneReady && !isComplete;
-
   return (
     <div className="fixed inset-0 h-[100dvh] max-h-[100dvh] bg-slate-950 text-slate-100 overflow-hidden font-sans select-none flex flex-col touch-none">
-      <AnimatePresence>
-        {showLoading && (
-          <motion.div
-            key="loading-overlay"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center gap-8"
-          >
-            <div className="relative">
-              <motion.div
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.15, 0.3, 0.15]
-                }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full blur-3xl scale-150"
-                style={{ backgroundColor: beadColor }}
-              />
-              <div className="w-20 h-20 rounded-[24px] border border-white/10 flex items-center justify-center relative bg-white/[0.03] backdrop-blur-2xl">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: [0.4, 0, 0.2, 1] }}
-                  className="w-10 h-10 rounded-full border-2 border-transparent"
-                  style={{ borderTopColor: beadColor, borderRightColor: beadColor }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 rounded-full bg-white opacity-40 animate-pulse" />
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-[10px] font-black tracking-[0.5em] uppercase text-white/30">
-                {t.common.loading || "Immersion..."}
-              </p>
-              <div className="w-32 h-[1px] bg-white/5 relative overflow-hidden">
-                <motion.div
-                  animate={{ x: ['-100%', '100%'] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       {/* Static ambient glows — no animation for energy savings */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 bg-slate-950">
         <div
