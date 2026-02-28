@@ -86,9 +86,9 @@ function StaticChapelet({
         total === 33
           ? i === 10 || i === 21
           : total > 9 && (
-              i === Math.floor(total / 3) - 1 ||
-              i === Math.floor((2 * total) / 3) - 1
-            );
+            i === Math.floor(total / 3) - 1 ||
+            i === Math.floor((2 * total) / 3) - 1
+          );
       return { ...pt, isMarker, done: i < count, key: `${i}` };
     });
   }, [total, count, junctionY]);
@@ -293,8 +293,8 @@ export default function HomePage() {
 
       <main className="flex-1 flex flex-col z-10 max-w-[390px] mx-auto w-full overflow-hidden
         pt-[calc(env(safe-area-inset-top,24px)+0.5rem)]
-        pb-[calc(env(safe-area-inset-bottom,20px)+5.5rem)]
-        px-5 gap-3">
+        pb-[calc(env(safe-area-inset-bottom,20px)+6.5rem)]
+        px-5 gap-3 scroll-container select-none">
 
         {/* ── HEADER ─────────────────────────────── */}
         <motion.div
@@ -325,9 +325,8 @@ export default function HomePage() {
                 onClick={() => useSessionStore.getState().setLanguage(lang)}
                 aria-label={`Switch to ${lang.toUpperCase()}`}
                 aria-pressed={language === lang}
-                className={`px-2 py-1 rounded-[8px] text-[10px] font-black transition-all ${
-                  language === lang ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"
-                }`}
+                className={`px-2 py-1 rounded-[8px] text-[10px] font-black transition-all ${language === lang ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"
+                  }`}
               >
                 {lang.toUpperCase()}
               </button>

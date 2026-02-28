@@ -19,7 +19,7 @@ const NAV_ITEMS: { href: string; labelKey: string; icon: LucideIcon }[] = [
 
 // ─── Shared nav classes ────────────────────────────────────
 const NAV_CLS =
-    "fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/85 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 pb-[env(safe-area-inset-bottom,20px)] pt-2.5 select-none";
+    "fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/85 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/5 pb-safe pt-2.5 select-none touch-none";
 
 // ─── Active path check (handles trailing slash) ────────────
 function matchPath(pathname: string, href: string): boolean {
@@ -46,8 +46,8 @@ export function BottomNav() {
     const isReady = isMounted && hasHydrated;
 
     if (!isMounted) return null;
-    // Do not show bottom nav on info landing pages
-    if (pathname === "/" || pathname?.startsWith("/info")) return null;
+    // Do not show bottom nav on specifically excluded pages if any
+    if (pathname?.startsWith("/info")) return null;
 
     return (
         <nav

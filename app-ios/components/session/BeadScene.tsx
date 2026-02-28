@@ -185,6 +185,7 @@ interface BeadSceneProps {
     count: number;
     total: number;
     onAdvance: () => void;
+    onReady?: () => void;
     interactive?: boolean;
 }
 
@@ -278,7 +279,7 @@ const SceneInternal = memo(({ count, beadWindow, total, presetId, tapProgress }:
 });
 SceneInternal.displayName = "SceneInternal";
 
-export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneProps) => {
+export const BeadScene = memo(({ presetId, count, total, onAdvance, onReady }: BeadSceneProps) => {
     const isDragging = useRef(false);
     const isInteractiveRef = useRef(!useSessionStore.getState().isUiOpen && !useSessionStore.getState().isComplete);
     const [isUiOpen, setIsUiOpen] = useState(useSessionStore.getState().isUiOpen);
@@ -390,6 +391,7 @@ export const BeadScene = memo(({ presetId, count, total, onAdvance }: BeadSceneP
                 dpr={[1, 2]}
                 onCreated={(state) => {
                     state.gl.setClearColor(0x000000, 0); // Always transparent to show page mesh glows
+                    onReady?.();
                 }}
                 style={{ width: '100%', height: '100%' }}
             >

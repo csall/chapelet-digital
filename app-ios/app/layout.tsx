@@ -47,14 +47,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="bg-slate-950">
+    <html lang="fr">
       <head>
         <link rel="apple-touch-icon" href="/icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} h-[100dvh] overflow-hidden bg-slate-950 text-slate-100 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} h-screen h-[100dvh] overflow-hidden antialiased selection:bg-indigo-500/30`}
       >
         <MotionConfig reducedMotion="user">
           <SwRegister />
